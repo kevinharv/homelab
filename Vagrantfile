@@ -9,10 +9,12 @@ Vagrant.configure("2") do |config|
       v.cpus = 2
     end
 
-    # Define PRDOVPN configuration
-    #config.vm.define "prdovpn" do |prdovpn|
-     # prdovpn.vm.box = "generic/ubuntu2204"
-      #prdovpn.vm.hostname = "prdovpn"
-     # prdovpn.vm.network :private_network, ip: "192.168.56.10"
-    #end
-  end
+    # Define OpenVPN AS VM
+    config.vm.define "PRDOVPN" do |v|
+      v.vm.box      = "generic/rocky9"
+      v.vm.hostname = "PRDOVPN"
+      v.vm.network "private_network", ip: "10.100.1.10", hostname: true
+      v.vm.disk :disk, size: "10GB", primary: true
+      v.vm.disk :disk, size: "5GB", name: "storage"
+    end
+ end
