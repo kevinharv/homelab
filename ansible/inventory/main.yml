@@ -1,0 +1,21 @@
+---
+Kubernetes:
+  hosts:
+    PRDKUB1:
+      ansible_host: "10.100.1.21"
+      ansible_ssh_user: "vagrant"
+      ansible_become_password: "vagrant"
+      ansible_ssh_private_key_file: "~/.vagrant.d/insecure_private_key"
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    PRDKUB2:
+      ansible_host: "10.100.1.22"
+      ansible_ssh_user: "vagrant"
+      ansible_become_password: "vagrant"
+      ansible_ssh_private_key_file: "~/.vagrant.d/insecure_private_key"
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    PRDKUB3:
+      ansible_host: "10.100.1.23"
+      ansible_ssh_user: "vagrant"
+      ansible_become_password: "vagrant"
+      ansible_ssh_private_key_file: "~/.vagrant.d/insecure_private_key"
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"

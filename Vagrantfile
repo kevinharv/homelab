@@ -4,7 +4,7 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder '.', '/vagrant', disabled: true
   
     # Configure VM sizing
-    config.vm.provider "virtualbox" do |v|
+    config.vm.provider "libvirt" do |v|
       v.memory = 2048
       v.cpus = 2
     end
@@ -47,7 +47,7 @@ Vagrant.configure("2") do |config|
       config.vm.define "PRDKUB#{i}" do |v|
         v.vm.box      = "generic/rocky9"
         v.vm.hostname = "PRDKUB#{i}"
-        v.vm.network "private_network", ip: "10.100.1.2#{i}", hostname: true
+        v.vm.network :private_network, :ip => "10.100.1.2#{i}", hostname: true
         v.vm.disk :disk, size: "20GB", primary: true
       end
     end
