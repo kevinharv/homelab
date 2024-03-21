@@ -6,10 +6,23 @@
 
 # Common TASKS
 
-# PRE-REQUISITES
-# Disable SELinux - minimally supported in Kubelet
-# Disable SWAP
+- name: Disable SELinux
+  ansible.posix.selinux:
+    state: disabled
+
+- name: Disable swap on running system
+  command: swapoff -a
+  become: true
+
+- name: Disable swap in configuration
+  replace:
+    path: /etc/fstab
+    regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+    replace: '#\1\2\3swap\4'
+    backup: yes
+    
 # Install containerd container runtime
+
 
 # KUBERNETES INSTALLATION
 # Add Kubernetes repo
