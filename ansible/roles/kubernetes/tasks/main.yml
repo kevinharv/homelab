@@ -1,2 +1,21 @@
 ---
 
+# Pre-reqs
+# - pin kubeadm, kubelet, kubectl versions to same for install
+
+
+# Common TASKS
+
+# PRE-REQUISITES
+# Disable SELinux - minimally supported in Kubelet
+# Disable SWAP
+# Install containerd container runtime
+
+# KUBERNETES INSTALLATION
+# Add Kubernetes repo
+# Install kubelet kubeadm kubectl
+# Enable kubelet service
+
+# Init cluster on one control plane node - need to do checks to make idempotent
+# Join additional control plane - setup HA
+# Join worker nodes
