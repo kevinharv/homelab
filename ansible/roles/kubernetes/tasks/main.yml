@@ -1,33 +1,74 @@
 ---
-
-# Pre-reqs
-# - pin kubeadm, kubelet, kubectl versions to same for install
-
-
-# Common TASKS
-
+# OS Configuration Pre-Requisites
 - name: Disable SELinux
   ansible.posix.selinux:
     state: disabled
 
-- name: Disable swap on running system
+- name: Disable Swap
   command: swapoff -a
   become: true
 
-- name: Disable swap in configuration
+- name: Disable Swap in Configuration
   replace:
     path: /etc/fstab
     regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
     replace: '#\1\2\3swap\4'
     backup: yes
     
-# Install containerd container runtime
+# Install Container Runtime
+- name: Add Docker Repository
+  ansible.builtin.yum_repository:
+    name: Docker
+    description: Docker Engine and container runtime repository.
+    baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+    gpgcheck: yes
+    gpgkey: "60A 61C5 1B55 8A7F 742B 77AA C52F EB6B 621E 9F35"
+    enabled: yes
 
+- name: Install Container Runtime
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+    items:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
 
-# KUBERNETES INSTALLATION
-# Add Kubernetes repo
-# Install kubelet kubeadm kubectl
-# Enable kubelet service
+- name: Start & Enable Docker Service
+  ansible.builtin.service:
+    name: "docker"
+    state: started
+    enabled: yes
+
+# Install kubeadm
+- name: Add Kubernetes Repository
+  ansible.builtin.yum_repository:
+    name: kubernetes
+    description: Kubernetes Repository
+    baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64"
+    gpgcheck: yes
+    gpgkey: "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+    enabled: yes
+    repo_gpgcheck: yes
+    sslverify: yes
+
+- name: Install Kubernetes Packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+    items:
+      - kubelet
+      - kubeadm
+      - kubectl
+
+- name: Start & Enable Kubelet Service
+  ansible.builtin.service:
+    name: kubelet
+    state: started
+    enabled: yes
+
 
 # Init cluster on one control plane node - need to do checks to make idempotent
 # Join additional control plane - setup HA
