@@ -30,7 +30,7 @@ variable "default_root_password" {
 variable "power_state" {
   description = "Lab Target Power State"
   type        = bool
-  default     = false
+  default     = true
 }
 
 # -------------- Lab VPC --------------
@@ -52,47 +52,53 @@ resource "linode_vpc_subnet" "kubernetes" {
   ipv4   = "10.10.5.0/24"
 }
 
-# -------------- WireGuard Firewall --------------
-resource "linode_firewall" "wireguard_firewall" {
-  label = "wireguard_firewall"
+# -------------- Bastion Firewall --------------
+resource "linode_firewall" "bastion_firewall" {
+  label = "bastion_firewall"
 
-  # TODO - configure firewall for WireGuard service
+  inbound {
+    label    = "allow-authorized-ssh"
+    action   = "ACCEPT"
+    protocol = "TCP"
+    ports    = "22"
+    ipv4     = ["35.147.32.32/32"]
+    # ipv6     = ["::/0"]
+  }
 
-  # inbound {
-  #   label    = "allow-http"
-  #   action   = "ACCEPT"
-  #   protocol = "TCP"
-  #   ports    = "80"
-  #   ipv4     = ["0.0.0.0/0"]
-  #   ipv6     = ["::/0"]
-  # }
-
-  # inbound {
-  #   label    = "allow-https"
-  #   action   = "ACCEPT"
-  #   protocol = "TCP"
-  #   ports    = "443"
-  #   ipv4     = ["0.0.0.0/0"]
-  #   ipv6     = ["::/0"]
-  # }
+  inbound {
+    label    = "allow-wireguard-connections"
+    action   = "ACCEPT"
+    protocol = "UDP"
+    ports    = "51820"
+    ipv4     = ["0.0.0.0/0"]
+    ipv6     = ["::/0"]
+  }
 
   inbound_policy  = "DROP"
   outbound_policy = "ACCEPT"
 }
 
-# -------------- WireGuard VPN Server --------------
-resource "linode_instance" "prdwrgd" {
-  label       = "PRDWRGD"
+# -------------- Standard Firewall --------------
+resource "linode_firewall" "standard_firewall" {
+  label = "standard_firewall"
+
+  inbound_policy  = "DROP"
+  outbound_policy = "ACCEPT"
+}
+
+# -------------- Bastion Server --------------
+resource "linode_instance" "prdbstn" {
+  label       = "PRDBSTN"
   image       = "linode/rocky9"
   region      = "us-ord"
   type        = "g6-nanode-1"
-  firewall_id = linode_firewall.wireguard_firewall.id
+  firewall_id = linode_firewall.bastion_firewall.id
 
   booted          = var.power_state
   authorized_keys = var.ssh_keys
   root_pass       = var.default_root_password
 
-  tags = ["wireguard"]
+  tags = ["bastion"]
 
   interface {
     purpose = "public"

@@ -1,5 +1,5 @@
 ---
-Kubernetes:
+kubernetes:
   hosts:
     PRDKUB1:
       ansible_host: "10.100.1.21"

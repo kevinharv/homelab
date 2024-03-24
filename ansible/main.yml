@@ -1,0 +1,7 @@
+---
+- name: Configure Lab
+  hosts: all
+
+  roles:
+  - roles/common
+  - roles/bastion

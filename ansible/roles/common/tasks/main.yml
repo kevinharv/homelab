@@ -28,7 +28,7 @@
     mode: 0644
     backup: false
 
-- name: Append SSHD Configuration
+- name: Append SSHD Configuration - Banner
   ansible.builtin.template:
     src: templates/sshd_banner.j2
     dest: /etc/ssh/sshd_config.d/sshd_banner.conf
@@ -36,6 +36,14 @@
     group: root
     mode: 0600
     backup: false
+  notify: restart-sshd
 
-- name: Flush Handlers
-  meta: flush_handlers
+- name: Append SSHD Configuration - Disable Password Authentication
+  ansible.builtin.template:
+    src: templates/sshd_password_auth.j2
+    dest: /etc/ssh/sshd_config.d/sshd_password_auth.conf
+    owner: root
+    group: root
+    mode: 0600
+    backup: false
+  notify: restart-sshd

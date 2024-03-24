@@ -1,6 +1,6 @@
 galaxy_info:
   author: Kevin Harvey
-  description: Configure Kubernetes on Rocky Linux 9
+  description: Configure WireGuard Server on Rocky Linux 9
   license: GPL-3.0
   min_ansible_version: 2.1
 
@@ -9,4 +9,4 @@ galaxy_info:
     versions:
     - 9
 
-  galaxy_tags: ["kubernetes", "rocky"]
+  galaxy_tags: ["wireguard", "rocky"]

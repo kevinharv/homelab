@@ -1,0 +1,73 @@
+---
+- name: Set SELinux Permissive - Runtime
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+
+- name: Set SELinux Permissive - Configuration
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: 'SELINUX=permissive'
+    state: present
+
+- name: Enable WireGuard Kernel Module - Runtime
+  community.general.modprobe:
+    name: wireguard
+    state: present
+
+- name: Enable WireGuard Kernel Module - Configuration
+  ansible.builtin.template:
+    src: templates/wireguard.j2
+    dest: /etc/modules-load.d/wireguard.conf
+    owner: root
+    group: root
+    mode: 0600
+    backup: true
+
+- name: Install WireGuard Tools
+  ansible.builtin.package:
+    name: wireguard-tools
+    state: present
+
+- name: Install WireGuard Configuration
+  ansible.builtin.template:
+    src: templates/wg0.j2
+    dest: /etc/wireguard/wg0.conf
+    owner: root
+    group: root
+    mode: 0600
+    backup: true
+
+- name: Add IPv4 Port Forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: true
+    state: present
+    reload: true
+
+- name: Add IPv6 Port Forwarding
+  ansible.posix.sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: '1'
+    sysctl_set: true
+    state: present
+    reload: true
+
+- name: Allow WireGuard on Firewall
+  ansible.posix.firewalld:
+    port: 51820/udp
+    permanent: true
+    immediate: true
+    state: enabled
+
+- name: Reload Firewall
+  ansible.builtin.command:
+    cmd: firewall-cmd --reload
+
+- name: Start & Enable WireGuard Service
+  ansible.builtin.service:
+    name: wg-quick@wg0.service
+    state: started
+    enabled: yes

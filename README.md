@@ -14,13 +14,12 @@ the cloud, or in a local datacenter.
 This lab is hardware platform agnostic. This may be AWS EC2 VMs, Promox QEMU VMs, or anything else.
 | Hostname | IP Address | Service | OS |
 |----------|------------|---------|----|
-| PRDWRGD  | 10.10.1.6 |  | OpenVPN AS | Rocky Linux 9.1 |
+| PRDBSTN  | 10.10.1.6 | Bastion/VPN | Rocky Linux 9.1 |
 | PRDNAS1  | 10.10.1.7 | SMB/NFS | Rocky Linux 9.1 |
 | PRDIPA1  | 10.10.1.5 | FreeIPA | Rocky Linux 9.1 |
 | PRDKUB1  | 10.10.1.20 | Kubernetes | Rocky Linux 9.1 |
 | PRDKUB2  | 10.10.1.21 | Kubernetes | Rocky Linux 9.1 |
 | PRDKUB3  | 10.10.1.22 | Kubernetes | Rocky Linux 9.1 |
-| DEVNIX1  | 10.10.1.99 | Dev Box | NixOS |
 
 ### Subnets
 Management: 10.10.1.0/24
