@@ -5,7 +5,7 @@
     state: permissive
 
 - name: Set SELinux Permissive - Configuration
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/selinux/config
     regexp: '^SELINUX='
     line: 'SELINUX=permissive'

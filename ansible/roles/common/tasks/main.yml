@@ -47,3 +47,8 @@
     mode: 0600
     backup: false
   notify: restart-sshd
+
+- name: Install QEMU Guest Agent
+  ansible.builtin.package:
+    name: qemu-guest-agent
+    state: present
