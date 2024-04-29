@@ -1,14 +1,22 @@
 ---
 # OS Configuration Pre-Requisites
-- name: Disable SELinux
+- name: Set SELinux Permissive - Runtime
   ansible.posix.selinux:
-    state: disabled
+    policy: targeted
+    state: permissive
 
-- name: Disable Swap
+- name: Set SELinux Permissive - Configuration
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: 'SELINUX=permissive'
+    state: present
+
+- name: Disable Swap - Runtime
   command: swapoff -a
   become: true
 
-- name: Disable Swap in Configuration
+- name: Disable Swap - Configuration
   replace:
     path: /etc/fstab
     regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
@@ -16,25 +24,30 @@
     backup: yes
     
 # Install Container Runtime
-- name: Add Docker Repository
-  ansible.builtin.yum_repository:
-    name: Docker
-    description: Docker Engine and container runtime repository.
-    baseurl: https://download.docker.com/linux/centos/docker-ce.repo
-    gpgcheck: yes
-    gpgkey: "60A 61C5 1B55 8A7F 742B 77AA C52F EB6B 621E 9F35"
-    enabled: yes
+# - name: Add Docker Repository
+#   ansible.builtin.yum_repository:
+#     name: Docker
+#     description: Docker Engine and container runtime repository.
+#     baseurl: https://download.docker.com/linux/fedora/docker-ce.repo
+#     gpgcheck: yes
+#     gpgkey: "060A 61C5 1B55 8A7F 742B 77AA C52F EB6B 621E 9F35"
+#     enabled: yes
+
+- name: Add Docker CE Repository
+  ansible.builtin.get_url:
+    url: "https://download.docker.com/linux/centos/docker-ce.repo"
+    dest: "/etc/yum.repos.d/docker-ce.repo"
 
 - name: Install Container Runtime
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
-    items:
-      - docker-ce
-      - docker-ce-cli
-      - containerd.io
-      - docker-buildx-plugin
-      - docker-compose-plugin
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
 
 - name: Start & Enable Docker Service
   ansible.builtin.service:
@@ -42,14 +55,14 @@
     state: started
     enabled: yes
 
-# Install kubeadm
+# Install Kubernetes and kubeadm
 - name: Add Kubernetes Repository
   ansible.builtin.yum_repository:
     name: kubernetes
     description: Kubernetes Repository
-    baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64"
+    baseurl: "https://pkgs.k8s.io/core:/stable:/v1.30/rpm/"
     gpgcheck: yes
-    gpgkey: "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+    gpgkey: "https://pkgs.k8s.io/core:/stable:/v1.30/rpm/repodata/repomd.xml.key"
     enabled: yes
     repo_gpgcheck: yes
     sslverify: yes
@@ -58,10 +71,10 @@
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
-    items:
-      - kubelet
-      - kubeadm
-      - kubectl
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
 
 - name: Start & Enable Kubelet Service
   ansible.builtin.service:

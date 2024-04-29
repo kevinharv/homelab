@@ -14,7 +14,7 @@
 
 ---
 - name: Deploy Kubernetes Cluster
-  hosts: kubernetes
+  hosts: PRDKUBE1
   become: true
   roles:
   - roles/kubernetes
