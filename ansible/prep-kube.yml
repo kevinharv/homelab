@@ -1,7 +1,10 @@
 ---
 - name: Common Configuration
-  hosts: PRDKUBE1
+  hosts: PRDKUBCP1
   become: true
-  roles:
-  # - roles/common
-  - roles/kubernetes
+
+  tasks:
+  - name: Install Common Configuration
+    ansible.builtin.include_role: roles/common
+  - name: Configuration Tasks for Kubernetes
+    ansible.builtin.include_role: roles/kubernetes
