@@ -22,16 +22,35 @@
     regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
     replace: '#\1\2\3swap\4'
     backup: yes
-    
-# Install Container Runtime
-# - name: Add Docker Repository
-#   ansible.builtin.yum_repository:
-#     name: Docker
-#     description: Docker Engine and container runtime repository.
-#     baseurl: https://download.docker.com/linux/fedora/docker-ce.repo
-#     gpgcheck: yes
-#     gpgkey: "060A 61C5 1B55 8A7F 742B 77AA C52F EB6B 621E 9F35"
-#     enabled: yes
+
+- name: Enable Kernel Modules
+  community.general.modprobe:
+    name:
+      - overlay
+      - br_netfliter
+    state: present
+    persistent: present
+
+- name: Enable IPv4 Forwarding
+  ansible.builin.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_set: yes
+    reload: yes
+
+- name: Enable IP Tables IPv4 Bridging
+  ansible.builin.sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: "1"
+    sysctl_set: yes
+    reload: yes
+
+- name: Enable IP Tables IPv6 Bridging
+  ansible.builin.sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: "1"
+    sysctl_set: yes
+    reload: yes
 
 - name: Add Docker CE Repository
   ansible.builtin.get_url:
@@ -40,18 +59,21 @@
 
 - name: Install Container Runtime
   ansible.builtin.package:
-    name: "{{ item }}"
+    name: "containerd.io"
     state: present
-  loop:
-    - docker-ce
-    - docker-ce-cli
-    - containerd.io
-    - docker-buildx-plugin
-    - docker-compose-plugin
+
+- name: Copy Containerd Configuration
+  ansible.builtin.template:
+    src: templates/containerd_config.j2
+    dest: /etc/containerd/config.toml
+    owner: root
+    group: root
+    mode: 0644
+    backup: true
 
 - name: Start & Enable Docker Service
   ansible.builtin.service:
-    name: "docker"
+    name: "containerd"
     state: started
     enabled: yes
 
@@ -82,7 +104,21 @@
     state: started
     enabled: yes
 
-
-# Init cluster on one control plane node - need to do checks to make idempotent
-# Join additional control plane - setup HA
-# Join worker nodes
+- name: Enable Firewall Ports
+  ansible.posix.firewalld:
+    port: "{{ item }}/tcp"
+    state: enabled
+    permanent: yes
+  loop:
+    - 6443
+    - 2379
+    - 2380
+    - 10250
+    - 10251
+    - 10252
+    - 5473
+  
+- name: Restart Firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: reloaded

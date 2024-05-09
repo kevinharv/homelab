@@ -68,6 +68,7 @@ resource "proxmox_vm_qemu" "PRDKUBCP1" {
   network {
     model  = "virtio"
     bridge = "vmbr0"
+    macaddr = "DE:5A:BA:C4:82:8E"
   }
 
   # Cloud-init user and SSH key
