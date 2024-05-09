@@ -25,13 +25,8 @@ variable "proxmox_token" {
   type        = string
 }
 
-variable "ssh_keys" {
+variable "ssh_key" {
   description = "Default SSH Keys"
-  type        = string
-}
-
-variable "default_root_password" {
-  description = "Default Root Password"
   type        = string
 }
 
@@ -42,10 +37,11 @@ resource "proxmox_vm_qemu" "PRDKUBCP1" {
   target_node = "prox1"
   vmid        = 201
 
+  # Clone from RHEL 9 Template
   os_type = "cloud-init"
   clone   = "R9-TEMPL-NOSWAP"
-  # full_clone = true
 
+  # Hardware configuration
   cores   = 2
   sockets = 1
   memory  = 4096
@@ -53,10 +49,10 @@ resource "proxmox_vm_qemu" "PRDKUBCP1" {
   balloon = 1
   agent   = 1
 
+  # Boot configuration
   cloudinit_cdrom_storage = "local-lvm"
   boot                    = "order=scsi0;ide3"
 
-  # tablet = false
   disks {
     scsi {
       scsi0 {
@@ -72,9 +68,9 @@ resource "proxmox_vm_qemu" "PRDKUBCP1" {
   network {
     model  = "virtio"
     bridge = "vmbr0"
-    # tag    = 256
   }
 
+  # Cloud-init user and SSH key
   ciuser  = "kevin"
-  sshkeys = var.ssh_keys
+  sshkeys = var.ssh_key
 }
