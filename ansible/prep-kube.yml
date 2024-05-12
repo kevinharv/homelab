@@ -5,7 +5,9 @@
 
   tasks:
   - name: Install Common Configuration
-    ansible.builtin.include_role: roles/common
+    ansible.builtin.include_role: 
+      name: roles/common
   
   - name: Configuration Tasks for Kubernetes
-    ansible.builtin.include_role: roles/kubernetes
+    ansible.builtin.include_role: 
+      name: roles/kubernetes

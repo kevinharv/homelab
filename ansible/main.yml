@@ -4,17 +4,3 @@
   become: true
   roles:
   - roles/common
-
----
-- name: Configure Bastion Host
-  hosts: PRDBSTN
-  become: true
-  roles:
-  - roles/bastion
-
----
-- name: Deploy Kubernetes Cluster
-  hosts: PRDKUBE1
-  become: true
-  roles:
-  - roles/kubernetes

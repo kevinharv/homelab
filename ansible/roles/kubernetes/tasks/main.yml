@@ -25,28 +25,29 @@
 
 - name: Enable Kernel Modules
   community.general.modprobe:
-    name:
-      - overlay
-      - br_netfliter
+    name: "{{ item }}"
     state: present
     persistent: present
+  loop:
+    - overlay
+    - br_netfilter
 
 - name: Enable IPv4 Forwarding
-  ansible.builin.sysctl:
+  ansible.builtin.sysctl:
     name: net.ipv4.ip_forward
     value: "1"
     sysctl_set: yes
     reload: yes
 
 - name: Enable IP Tables IPv4 Bridging
-  ansible.builin.sysctl:
+  ansible.builtin.sysctl:
     name: net.bridge.bridge-nf-call-iptables
     value: "1"
     sysctl_set: yes
     reload: yes
 
 - name: Enable IP Tables IPv6 Bridging
-  ansible.builin.sysctl:
+  ansible.builtin.sysctl:
     name: net.bridge.bridge-nf-call-ip6tables
     value: "1"
     sysctl_set: yes
@@ -71,7 +72,7 @@
     mode: 0644
     backup: true
 
-- name: Start & Enable Docker Service
+- name: Start & Enable Containerd Service
   ansible.builtin.service:
     name: "containerd"
     state: started

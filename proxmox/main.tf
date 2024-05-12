@@ -75,3 +75,49 @@ resource "proxmox_vm_qemu" "PRDKUBCP1" {
   ciuser  = "kevin"
   sshkeys = var.ssh_key
 }
+
+# -------------- Kubernetes Worker Node 1 --------------
+resource "proxmox_vm_qemu" "PRDKUBW1" {
+  name        = "PRDKUBW1"
+  desc        = "Production Kubernetes Worker Node 1"
+  target_node = "prox1"
+  vmid        = 205
+
+  # Clone from RHEL 9 Template
+  os_type = "cloud-init"
+  clone   = "R9-TEMPL-NOSWAP"
+
+  # Hardware configuration
+  cores   = 2
+  sockets = 1
+  memory  = 4096
+  scsihw  = "virtio-scsi-single"
+  balloon = 1
+  agent   = 1
+
+  # Boot configuration
+  cloudinit_cdrom_storage = "local-lvm"
+  boot                    = "order=scsi0;ide3"
+
+  disks {
+    scsi {
+      scsi0 {
+        disk {
+          size    = 30
+          cache   = "writeback"
+          storage = "local-lvm"
+        }
+      }
+    }
+  }
+
+  network {
+    model  = "virtio"
+    bridge = "vmbr0"
+    # macaddr = "DE:5A:BA:C4:82:8E" # Set after initial up so DHCP reservation holds
+  }
+
+  # Cloud-init user and SSH key
+  ciuser  = "kevin"
+  sshkeys = var.ssh_key
+}
