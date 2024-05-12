@@ -1,6 +1,6 @@
 ---
-- name: Common Configuration
-  hosts: PRDKUBCP1
+- name: Deploy K8s OS Configurations
+  hosts: kubernetes
   become: true
 
   tasks:

@@ -114,7 +114,7 @@ resource "proxmox_vm_qemu" "PRDKUBW1" {
   network {
     model  = "virtio"
     bridge = "vmbr0"
-    # macaddr = "DE:5A:BA:C4:82:8E" # Set after initial up so DHCP reservation holds
+    macaddr = "DA:98:B6:42:EB:7F" # Set after initial up so DHCP reservation holds
   }
 
   # Cloud-init user and SSH key
