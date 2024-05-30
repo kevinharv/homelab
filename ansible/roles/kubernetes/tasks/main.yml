@@ -31,6 +31,10 @@
   loop:
     - overlay
     - br_netfilter
+    - ip_vs
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
 
 - name: Enable IPv4 Forwarding
   ansible.builtin.sysctl:
@@ -98,6 +102,7 @@
     - kubelet
     - kubeadm
     - kubectl
+    - kernel-devel
 
 - name: Start & Enable Kubelet Service
   ansible.builtin.service:
@@ -117,6 +122,7 @@
     - 10250
     - 10251
     - 10252
+    - 10255
     - 5473
   
 - name: Restart Firewalld
