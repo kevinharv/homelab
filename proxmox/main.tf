@@ -90,7 +90,7 @@ resource "proxmox_vm_qemu" "PRDKUBW1" {
   # Hardware configuration
   cores   = 2
   sockets = 1
-  memory  = 4096
+  memory  = 6144
   scsihw  = "virtio-scsi-single"
   balloon = 1
   agent   = 1
