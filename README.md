@@ -24,8 +24,7 @@ This lab is hardware platform agnostic. This may be AWS EC2 VMs, Promox QEMU VMs
 *Proxmox homelab all runs on the flat 192.168.1.0/24 network.*
 
 ### Subnets
-Management: 10.10.1.0/24
-Kubernetes?: 10.10.5.0/24
+Kubernetes: 10.244.0.0/16
 
 ## Services
 ### Core
