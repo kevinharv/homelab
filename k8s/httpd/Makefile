@@ -14,7 +14,7 @@ build:
 	$(CR) compose build
 
 stop:
-	$(CR) compose down -v
+	$(CR) compose down
 
 restart: stop run
 

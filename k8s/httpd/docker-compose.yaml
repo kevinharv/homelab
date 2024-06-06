@@ -5,9 +5,10 @@ services:
     container_name: httpd-enterprise
     ports: 
       - 80:80
+      - 81:81
       - 443:443
     volumes:
-      # - ./demo-site:/usr/local/apache2/htdocs
+      - site-content:/usr/local/apache2/htdocs
       - ./config/httpd.conf:/usr/local/apache2/conf/httpd.conf
       - ./config/httpd-dav.conf:/usr/local/apache2/conf/extras/httpd-dav.conf
       - ./certs/cert.pem:/usr/local/apache2/conf/server.crt
@@ -18,3 +19,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
+
+volumes:
+  site-content:
