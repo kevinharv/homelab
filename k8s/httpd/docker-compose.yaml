@@ -9,6 +9,7 @@ services:
     volumes:
       - ./demo-site:/usr/local/apache2/htdocs
       - ./config/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./config/httpd-dav.conf:/usr/local/apache2/conf/extras/httpd-dav.conf
       - ./certs/cert.pem:/usr/local/apache2/conf/server.crt
       - ./certs/key.pem:/usr/local/apache2/conf/server.key
     healthcheck:

@@ -3,7 +3,7 @@ VERSION := 1
 NAME := kevinharv/httpd
 TAG := $(NAME):$(VERSION)
 
-run: build
+run:
 	$(CR) compose up -d
 	make logs
 
