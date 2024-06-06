@@ -1,0 +1,19 @@
+---
+services:
+  httpd:
+    build: .
+    container_name: httpd-enterprise
+    ports: 
+      - 80:80
+      - 443:443
+    volumes:
+      - ./demo-site:/usr/local/apache2/htdocs
+      - ./config/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./certs/cert.pem:/usr/local/apache2/conf/server.crt
+      - ./certs/key.pem:/usr/local/apache2/conf/server.key
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost", "||", "exit", "1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
