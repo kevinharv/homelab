@@ -1,0 +1,13 @@
+---
+- name: Deploy K8s OS Configurations
+  hosts: kubernetes
+  become: true
+
+  tasks:
+  - name: Install Common Configuration
+    ansible.builtin.include_role: 
+      name: roles/common
+  
+  - name: Configuration Tasks for Kubernetes
+    ansible.builtin.include_role: 
+      name: roles/kubernetes

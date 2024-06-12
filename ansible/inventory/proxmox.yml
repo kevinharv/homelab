@@ -1,0 +1,23 @@
+---
+all:
+  hosts:
+    PRDBSTN:
+      ansible_host: "192.168.1.184"
+      ansible_ssh_user: "kevin"
+      ansible_become_password: "{{ linode_become_pass }}"
+      ansible_ssh_private_key_file: "~/.ssh/prox_lab"
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+kubernetes:
+  hosts:
+    PRDKUBCP1:
+      ansible_host: "192.168.1.66"
+      ansible_ssh_user: "kevin"
+      ansible_become_password: "{{ linode_become_pass }}"
+      ansible_ssh_private_key_file: "~/.ssh/prox_lab"
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    PRDKUBW1:
+      ansible_host: "192.168.1.4"
+      ansible_ssh_user: "kevin"
+      ansible_become_password: "{{ linode_become_pass }}"
+      ansible_ssh_private_key_file: "~/.ssh/prox_lab"
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"

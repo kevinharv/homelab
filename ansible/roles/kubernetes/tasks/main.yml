@@ -1,0 +1,131 @@
+---
+# OS Configuration Pre-Requisites
+- name: Set SELinux Permissive - Runtime
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+
+- name: Set SELinux Permissive - Configuration
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: 'SELINUX=permissive'
+    state: present
+
+- name: Disable Swap - Runtime
+  command: swapoff -a
+  become: true
+
+- name: Disable Swap - Configuration
+  replace:
+    path: /etc/fstab
+    regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+    replace: '#\1\2\3swap\4'
+    backup: yes
+
+- name: Enable Kernel Modules
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: present
+    persistent: present
+  loop:
+    - overlay
+    - br_netfilter
+    - ip_vs
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
+
+- name: Enable IPv4 Forwarding
+  ansible.builtin.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_set: yes
+    reload: yes
+
+- name: Enable IP Tables IPv4 Bridging
+  ansible.builtin.sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: "1"
+    sysctl_set: yes
+    reload: yes
+
+- name: Enable IP Tables IPv6 Bridging
+  ansible.builtin.sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: "1"
+    sysctl_set: yes
+    reload: yes
+
+- name: Add Docker CE Repository
+  ansible.builtin.get_url:
+    url: "https://download.docker.com/linux/centos/docker-ce.repo"
+    dest: "/etc/yum.repos.d/docker-ce.repo"
+
+- name: Install Container Runtime
+  ansible.builtin.package:
+    name: "containerd.io"
+    state: present
+
+- name: Copy Containerd Configuration
+  ansible.builtin.template:
+    src: templates/containerd_config.j2
+    dest: /etc/containerd/config.toml
+    owner: root
+    group: root
+    mode: 0644
+    backup: true
+
+- name: Start & Enable Containerd Service
+  ansible.builtin.service:
+    name: "containerd"
+    state: started
+    enabled: yes
+
+# Install Kubernetes and kubeadm
+- name: Add Kubernetes Repository
+  ansible.builtin.yum_repository:
+    name: kubernetes
+    description: Kubernetes Repository
+    baseurl: "https://pkgs.k8s.io/core:/stable:/v1.30/rpm/"
+    gpgcheck: yes
+    gpgkey: "https://pkgs.k8s.io/core:/stable:/v1.30/rpm/repodata/repomd.xml.key"
+    enabled: yes
+    repo_gpgcheck: yes
+    sslverify: yes
+
+- name: Install Kubernetes Packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
+    - kernel-devel
+
+- name: Start & Enable Kubelet Service
+  ansible.builtin.service:
+    name: kubelet
+    state: started
+    enabled: yes
+
+- name: Enable Firewall Ports
+  ansible.posix.firewalld:
+    port: "{{ item }}/tcp"
+    state: enabled
+    permanent: yes
+  loop:
+    - 6443
+    - 2379
+    - 2380
+    - 10250
+    - 10251
+    - 10252
+    - 10255
+    - 5473
+  
+- name: Restart Firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: reloaded
