@@ -2,10 +2,12 @@
 *Enterprise ready Apache webserver environment complete with LDAP authentication and WebDAV support. (soon TM)*
 
 # To-Do
+1. Create PVC with content on K8s
+1. Create two services (content and dav)
+    - Map to different ports, listen in Apache on different ports
+    - Easier to test
+1. DAV locking on K8s?
 1. Get WebDAV with LDAP auth working
-1. Migrate to K8s and test DAV locking
-    - manage volume and permissions for lock
-    - manage volume and permissions for content
 1. Add SAML SSO via Shibboleth module?
 1. Configure log retention - very little because stdout logging in container will be captured by K8s
 
