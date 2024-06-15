@@ -47,6 +47,7 @@ data:
       ServerAdmin admin@example.com
       DocumentRoot "/usr/local/apache2/htdocs"
       ServerName content.example.com
+      Require all granted
     </VirtualHost>
     
     <VirtualHost *:80>
@@ -112,7 +113,7 @@ data:
     <IfModule proxy_html_module>
       Include conf/extra/proxy-html.conf
     </IfModule>
-    
+
     <IfModule ssl_module>
       SSLRandomSeed startup builtin
       SSLRandomSeed connect builtin

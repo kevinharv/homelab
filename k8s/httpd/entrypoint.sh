@@ -9,7 +9,7 @@ chmod -R 777 /var/lib/dav
 
 # Ensure ownership of configuration
 # chown -R www-data:www-data /usr/local/apache2/conf
-chmod -R o+r /usr/local/apache2/conf
+# chmod -R o+r /usr/local/apache2/conf
 
 # Ensure ownership of site content
 # chown -R www-data:www-data /usr/local/apache2/htdocs
