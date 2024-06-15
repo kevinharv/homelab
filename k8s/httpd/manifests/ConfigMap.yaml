@@ -47,7 +47,9 @@ data:
       ServerAdmin admin@example.com
       DocumentRoot "/usr/local/apache2/htdocs"
       ServerName content.example.com
-      Require all granted
+      <Directory "/usr/local/apache2/htdocs">
+        Require all granted
+      </Directory>
     </VirtualHost>
     
     <VirtualHost *:80>
