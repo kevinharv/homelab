@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webinfra-httpd
+  labels:
+    app: webinfra
+spec:
+  selector:
+    matchLabels:
+      app: webinfra
+  strategy:
+    type: Recreated
+  template:
+    metadata:
+      labels:
+        app: webinfra
+    spec:
+      containers:
+      - image: kevharv/httpd-enterprise:latest
+        name: httpd-enterprise
+        ports:
+        - containerPort: 80
+          name: webinfra
+        volumeMounts:
+        - name: site-data
+          mountPath: /usr/local/apache2/htdocs
+        - name: server-config
+          mountPath: /usr/local/apache2/conf/httpd.conf
+        # add WebDAV lockfile volume later
+      volumes:
+      - name: site-data
+        persistenVolumeClaim:
+          claimName: webinfra-sitedata
+      - name: server-config
+        configMap:
+          name: httpd-config

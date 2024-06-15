@@ -18,5 +18,9 @@ stop:
 
 restart: stop build run
 
+push:
+	$(CR) build -t kevharv/httpd-enterprise:latest .
+	$(CR) push kevharv/httpd-enterprise:latest
+
 clean:
 	$(CR) system prune -a --filter "until=24h"
