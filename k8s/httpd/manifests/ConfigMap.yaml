@@ -1,0 +1,71 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: httpd-config
+data:
+  httpd.conf: |
+    ServerAdmin you@example.com
+    ServerRoot "/usr/local/apache2"
+    Listen 80
+    
+    LoadModule mpm_event_module modules/mod_mpm_event.so
+    LoadModule authn_file_module modules/mod_authn_file.so
+    LoadModule authn_core_module modules/mod_authn_core.so
+    LoadModule authz_host_module modules/mod_authz_host.so
+    LoadModule authz_groupfile_module modules/mod_authz_groupfile.so
+    LoadModule authz_user_module modules/mod_authz_user.so
+    LoadModule authz_core_module modules/mod_authz_core.so
+    LoadModule access_compat_module modules/mod_access_compat.so
+    LoadModule auth_basic_module modules/mod_auth_basic.so
+    LoadModule auth_digest_module modules/mod_auth_digest.so
+    LoadModule socache_shmcb_module modules/mod_socache_shmcb.so
+    LoadModule reqtimeout_module modules/mod_reqtimeout.so
+    LoadModule filter_module modules/mod_filter.so
+    LoadModule mime_module modules/mod_mime.so
+    LoadModule log_config_module modules/mod_log_config.so
+    LoadModule env_module modules/mod_env.so
+    LoadModule headers_module modules/mod_headers.so
+    LoadModule setenvif_module modules/mod_setenvif.so
+    LoadModule version_module modules/mod_version.so
+    LoadModule ssl_module modules/mod_ssl.so
+    LoadModule unixd_module modules/mod_unixd.so
+    LoadModule dav_module modules/mod_dav.so
+    LoadModule status_module modules/mod_status.so
+    LoadModule autoindex_module modules/mod_autoindex.so
+    LoadModule dav_fs_module modules/mod_dav_fs.so
+    LoadModule dav_lock_module modules/mod_dav_lock.so
+    LoadModule dir_module modules/mod_dir.so
+    LoadModule alias_module modules/mod_alias.so
+    
+    <IfModule unixd_module>
+    User www-data
+    Group www-data
+    </IfModule>
+    
+    <VirtualHost *:80>
+      ServerAdmin admin@example.com
+      DocumentRoot "/usr/local/apache2/htdocs"
+      ServerName content.example.com
+    </VirtualHost>
+    
+    <VirtualHost *:80>
+      ServerAdmin admin@example.com
+      DocumentRoot "/usr/local/apache2/htdocs"
+      ServerName webdav.example.com
+
+      <Directory "/usr/local/apache2/htdocs">
+          Dav On
+          DirectoryIndex disabled
+          Require all granted
+      </Directory>
+      
+      # DBM support
+      DavLockDB /var/lib/dav/lockdb
+    </VirtualHost>
+    
+    <Directory />
+      AllowOverride none
+      Require all denied
+    </Directory>
+  httpd-dav.conf: |

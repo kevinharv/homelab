@@ -16,7 +16,7 @@ build:
 stop:
 	$(CR) compose down
 
-restart: stop run
+restart: stop build run
 
 clean:
 	$(CR) system prune -a --filter "until=24h"
