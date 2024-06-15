@@ -30,7 +30,7 @@ spec:
         # add WebDAV lockfile volume later
       volumes:
       - name: site-data
-        persistenVolumeClaim:
+        persistentVolumeClaim:
           claimName: webinfra-sitedata
       - name: server-config
         configMap:
