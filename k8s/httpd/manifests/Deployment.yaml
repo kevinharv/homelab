@@ -21,7 +21,9 @@ spec:
         name: httpd-enterprise
         ports:
         - containerPort: 80
-          name: webinfra
+          name: http
+        - containerPort: 81
+          name: webdav
         volumeMounts:
         - name: site-data
           mountPath: /usr/local/apache2/htdocs
