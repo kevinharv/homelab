@@ -5,8 +5,9 @@ metadata:
   name: httpd-config
 data:
   httpd.conf: |
-    ServerAdmin you@example.com
     ServerRoot "/usr/local/apache2"
+    ServerAdmin admin@example.com
+    ServerName httpd.kevharv.com
     Listen 80
     Listen 81
     
@@ -40,9 +41,17 @@ data:
     LoadModule alias_module modules/mod_alias.so
     
     <IfModule unixd_module>
-    User www-data
-    Group www-data
+      User www-data
+      Group www-data
     </IfModule>
+
+    <IfModule ldap_module>
+      LDAPSharedCacheSize 200000
+      LDAPCacheEntries 1024
+      LDAPCacheTTL 600
+      LDAPOpCacheEntries 1024
+      LDAPOpCacheTTL 600
+    </IfModule> 
     
     <VirtualHost *:80>
       ServerAdmin admin@example.com
@@ -61,18 +70,17 @@ data:
       <Directory "/usr/local/apache2/htdocs">
         Dav On
         DirectoryIndex disabled
-        # Require all granted
         AuthType Basic
         AuthName "WebDAV Restricted Area"
         AuthBasicProvider ldap
-        AuthLDAPURL "ldap://192.168.1.247/OU=Harvey Users,DC=ad,DC=kevharv,DC=com"
+        AuthLDAPURL "ldap://192.168.1.247:389/DC=ad,DC=kevharv,DC=com?sAMAccountName?sub?(objectClass=user)"
         AuthLDAPBindDN "CN=Kevin,OU=Harvey Users,DC=ad,DC=kevharv,DC=com"
         AuthLDAPBindPassword "Testing123"
-        # Require valid-user
+        Require ldap-user "kmh"
 
-        <LimitExcept PROPFIND GET HEAD OPTIONS>
-            Require valid-user
-        </LimitExcept>
+        # <LimitExcept PROPFIND GET HEAD OPTIONS>
+        #     Require valid-user
+        # </LimitExcept>
       </Directory>
       
       # DBM support

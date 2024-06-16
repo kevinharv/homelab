@@ -5,6 +5,7 @@ services:
     container_name: httpd-enterprise
     ports: 
       - 80:80
+      - 81:81
       - 443:443
     volumes:
       - site-content:/usr/local/apache2/htdocs
