@@ -59,9 +59,20 @@ data:
       ServerName webdav.example.com
 
       <Directory "/usr/local/apache2/htdocs">
-          Dav On
-          DirectoryIndex disabled
-          Require all granted
+        Dav On
+        DirectoryIndex disabled
+        # Require all granted
+        AuthType Basic
+        AuthName "WebDAV Restricted Area"
+        AuthBasicProvider ldap
+        AuthLDAPURL "ldap://192.168.1.247/OU=Harvey Users,DC=ad,DC=kevharv,DC=com"
+        AuthLDAPBindDN "CN=Kevin,OU=Harvey Users,DC=ad,DC=kevharv,DC=com"
+        AuthLDAPBindPassword "Testing123"
+        # Require valid-user
+
+        <LimitExcept PROPFIND GET HEAD OPTIONS>
+            Require valid-user
+        </LimitExcept>
       </Directory>
       
       # DBM support
