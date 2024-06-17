@@ -1,6 +1,0 @@
----
-resources:
-  - PersistentVolumeClaim.yaml
-  - Service.yaml
-  - ConfigMap.yaml
-  - Deployment.yaml
