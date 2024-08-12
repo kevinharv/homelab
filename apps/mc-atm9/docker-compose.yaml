@@ -1,0 +1,20 @@
+---
+services:
+    mc-atm9:
+        container_name: mc-atm9
+        image: itzg/minecraft-server
+        tty: true
+        stdin_open: true
+        ports:
+        - 25565:25565
+        environment:
+            EULA: "TRUE"
+            CF_API_KEY: ${API_KEY}
+            TYPE: "AUTO_CURSEFORGE"
+            CF_PAGE_URL: "https://www.curseforge.com/minecraft/modpacks/all-the-mods-9"
+            MEMORY: "4G"
+        volumes:
+        - mc-data:/data
+
+volumes:
+    mc-data:
