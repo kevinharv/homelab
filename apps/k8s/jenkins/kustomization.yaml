@@ -1,0 +1,7 @@
+---
+resources:
+  - namespace.yaml
+  - serviceAccount.yaml
+  - service.yaml
+  - volume.yaml
+  - deployment.yaml
