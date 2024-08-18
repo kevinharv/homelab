@@ -1,0 +1,7 @@
+---
+resources:
+  - namespace.yaml
+  - service.yaml
+  - volume.yaml
+  - ingress.yaml
+  - deployment.yaml
