@@ -3,16 +3,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: www
+    app: webinfra
+    tier: www
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: www
+      app: webinfra
+      tier: content
   template:
     metadata:
       labels:
-        app: www
+        app: webinfra
+        tier: content
     spec:
       containers:
         - name: httpd
@@ -20,26 +23,32 @@ spec:
           ports:
             - name: http
               containerPort: 80
-          livenessProbe:
-            httpGet:
-              path: "/"
-              port: 80
-            initialDelaySeconds: 10
-            periodSeconds: 30
-            timeoutSeconds: 5
-            failureThreshold: 5
-          readinessProbe:
-            httpGet:
-              path: "/"
-              port: 80
-            initialDelaySeconds: 10
-            periodSeconds: 30
-            timeoutSeconds: 5
-            failureThreshold: 3
+          # livenessProbe:
+          #   httpGet:
+          #     path: "/"
+          #     port: 80
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 30
+          #   timeoutSeconds: 5
+          #   failureThreshold: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: "/"
+          #     port: 80
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 30
+          #   timeoutSeconds: 5
+          #   failureThreshold: 3
           volumeMounts:
             - name: www-content
               mountPath: /usr/local/apache2/htdocs
+            - name: httpd-config
+              mountPath: /usr/local/apache2/conf/httpd.conf
+              subPath: httpd.conf
       volumes:
         - name: www-content
           persistentVolumeClaim:
-              claimName: www-site-content
+            claimName: www-site-content
+        - name: httpd-config
+          configMap:
+            name: httpd-content-config

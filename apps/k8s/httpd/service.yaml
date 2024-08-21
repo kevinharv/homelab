@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: www
+  labels:
+    app: www
+    tier: content
+spec:
+  ports:
+    - name: http
+      port: 80
+  selector:
+    app: www
+    tier: content
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dav
+  labels:
+    app: www
+    tier: dav
+spec:
+  ports:
+    - name: http
+      port: 80
+  selector:
+    app: www
+    tier: dav
+  type: LoadBalancer

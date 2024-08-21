@@ -1,5 +1,5 @@
 ---
-namespace: www
+namespace: webinfra
 commonLabels:
   - serviceOwner: kevinharv
   - technicalContact: kevinharv
@@ -8,4 +8,5 @@ resources:
   - service.yaml
   - volume.yaml
   - ingress.yaml
+  - config.yaml
   - deployment.yaml
