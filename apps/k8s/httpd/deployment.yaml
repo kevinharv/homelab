@@ -4,18 +4,18 @@ kind: Deployment
 metadata:
   name: www-deployment
   labels:
-    app: webinfra
-    tier: www
+    app: www
+    tier: content
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: webinfra
+      app: www
       tier: content
   template:
     metadata:
       labels:
-        app: webinfra
+        app: www
         tier: content
     spec:
       containers:

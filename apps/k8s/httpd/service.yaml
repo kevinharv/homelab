@@ -10,10 +10,11 @@ spec:
   ports:
     - name: http
       port: 80
+      targetPort: 80
   selector:
     app: www
     tier: content
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -26,7 +27,8 @@ spec:
   ports:
     - name: http
       port: 80
+      targetPort: 80
   selector:
     app: www
     tier: dav
-  type: LoadBalancer
+  type: ClusterIP
