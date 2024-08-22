@@ -1,8 +1,5 @@
 ---
 namespace: webinfra
-commonLabels:
-  - serviceOwner: kevinharv
-  - technicalContact: kevinharv
 resources:
   - namespace.yaml
   - service.yaml
