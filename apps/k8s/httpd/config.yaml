@@ -175,7 +175,7 @@ data:
     <VirtualHost *:80>
       ServerAdmin admin@example.com
       DocumentRoot "/usr/local/apache2/htdocs"
-      ServerName dav.kevharv.com
+      ServerName webdav.kevharv.com
 
       <Directory "/usr/local/apache2/htdocs">
         Dav On
@@ -187,6 +187,8 @@ data:
         # AuthLDAPBindDN "CN=Kevin,OU=Harvey Users,DC=ad,DC=kevharv,DC=com"
         # AuthLDAPBindPassword "Testing123"
         # Require ldap-user "kmh"
+
+        Require all granted
 
         # <LimitExcept PROPFIND GET HEAD OPTIONS>
         #     Require valid-user

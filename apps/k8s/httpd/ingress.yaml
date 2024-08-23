@@ -8,21 +8,21 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  # - host: "webdav.kevharv.com"
-  #   http:
-  #     paths:
-  #     - pathType: Prefix
-  #       path: "/"
-  #       backend:
-  #         service:
-  #           name: dav
-  #           port:
-  #             number: 80
+  - host: "webdav.kevharv.com"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: dav
+            port:
+              number: 80
   - host: "content.kevharv.com"
     http:
       paths:
       - pathType: Prefix
-        path: "/me"
+        path: "/"
         backend:
           service:
             name: www
