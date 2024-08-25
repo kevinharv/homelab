@@ -1,12 +1,12 @@
 ---
 authentik:
     secret_key: "fjdskadjakfjdkasfjufdyagfhdgahfgdhagfdhgafdhgafhdgkafhdagfhdgsafdksga"
-    # This sends anonymous usage-data, stack traces on errors and
-    # performance data to sentry.io, and is fully opt-in
     error_reporting:
         enabled: false
     postgresql:
         password: "foobarpass"
+    log_level: "info"
+
 
 server:
     ingress:
@@ -22,3 +22,8 @@ postgresql:
         password: "foobarpass"
 redis:
     enabled: true
+
+global:
+    additionalLabels:
+        maintainer: kevin
+    
