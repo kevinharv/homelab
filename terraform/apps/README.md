@@ -4,6 +4,7 @@
 - Authentik
     - LDAP Outpost
     - Proxy Outpost
+    - Manage outposts from Terraform?
 - Apache Web Server(s)
     - POC for work mostly
     - Further develop content pipeline/management
