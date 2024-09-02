@@ -1,5 +1,9 @@
 # Infrastructure Deployment Terraform
 
+## Information
+### OpenEBS
+Replicated storage is currently disabled. The host firewalls are not currently configured to support replication, and with a single control plane node and a single worker node, there is little use in replicated storage. Should the cluster be expanded, enabling replicated storage becomes a priority.
+
 ## To-Do
 - Kubernetes nodes on Proxmox
     - Invoke Ansible for provisioning?

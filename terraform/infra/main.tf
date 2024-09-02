@@ -40,8 +40,6 @@ resource "helm_release" "openebs" {
   }
 }
 
-# To-Do - enable replicated storage once host firewall configs are updated to allow it
-
 
 # ========== Envoy Gateway ==========
 resource "helm_release" "envoy_gateway" {
@@ -54,8 +52,43 @@ resource "helm_release" "envoy_gateway" {
     namespace = "envoy-gateway"
 }
 
+resource "helm_release" "envoy_gateway_addon" {
+  name = "envoy-gateway-addon"
+  repository = "oci://docker.io/envoyproxy"
+  chart = "gateway-addons-helm"
+  version = "v0.0.0-latest"
+
+
+  create_namespace = true
+  namespace = "monitoring"
+
+  set {
+    name = "opentelemetry-collector.enabled"
+    value = "false"
+  }
+
+  set {
+    name = "loki.enabled"
+    value = "false"
+  }
+
+  set {
+    name = "grafana.enabled"
+    value = "false"
+  }
+
+  set {
+    name = "tempo.service.type"
+    value = "ClusterIP"
+  }
+
+  set {
+    name = "prometheus.server.service.type"
+    value = "ClusterIP"
+  }
+}
+
 # To-Do - deploy shared Gateway resource
-# To-Do - deploy Envoy metrics add-on
 
 
 # ========== Cert Manager ==========
@@ -79,4 +112,5 @@ resource "helm_release" "cert_manager" {
     }
 }
 
+# To-Do - create ClusterIssuer with self-signed certs for testing, mTLS
 # To-Do - create ClusterIssuer with DNS01 ACME challenge against Cloudflare
