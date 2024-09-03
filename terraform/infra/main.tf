@@ -3,20 +3,22 @@
 terraform {
   required_providers {
     kubernetes = {
-      source = "hashicorp/kubernetes"
+      source  = "hashicorp/kubernetes"
       version = "2.32.0"
     }
 
     helm = {
-      source = "hashicorp/helm"
+      source  = "hashicorp/helm"
       version = "2.15.0"
     }
   }
 }
 
 provider "kubernetes" {
-  config_path    = "~/.kube/config"
+  config_path = "~/.kube/config"
 }
+
+# To-Do - variables, mostly for names of various resources (Ex: cert issuer names)
 
 # ========== CNI ==========
 
@@ -32,7 +34,7 @@ resource "helm_release" "openebs" {
   cleanup_on_fail = true
 
   create_namespace = true
-  namespace = "openebs"
+  namespace        = "openebs"
 
   set {
     name  = "engines.replicated.mayastor.enabled"
@@ -43,47 +45,47 @@ resource "helm_release" "openebs" {
 
 # ========== Envoy Gateway ==========
 resource "helm_release" "envoy_gateway" {
-    name = "envoy-gateway"
-    repository = "oci://registry-1.docker.io/envoyproxy"
-    chart = "gateway-helm"
-    version = "v1.1.0"
+  name       = "envoy-gateway"
+  repository = "oci://registry-1.docker.io/envoyproxy"
+  chart      = "gateway-helm"
+  version    = "v1.1.0"
 
-    create_namespace = true
-    namespace = "envoy-gateway"
+  create_namespace = true
+  namespace        = "envoy-gateway"
 }
 
 resource "helm_release" "envoy_gateway_addon" {
-  name = "envoy-gateway-addon"
+  name       = "envoy-gateway-addon"
   repository = "oci://docker.io/envoyproxy"
-  chart = "gateway-addons-helm"
-  version = "v0.0.0-latest"
+  chart      = "gateway-addons-helm"
+  version    = "v0.0.0-latest"
 
 
   create_namespace = true
-  namespace = "monitoring"
+  namespace        = "monitoring"
 
   set {
-    name = "opentelemetry-collector.enabled"
+    name  = "opentelemetry-collector.enabled"
     value = "false"
   }
 
   set {
-    name = "loki.enabled"
+    name  = "loki.enabled"
     value = "false"
   }
 
   set {
-    name = "grafana.enabled"
+    name  = "grafana.enabled"
     value = "false"
   }
 
   set {
-    name = "tempo.service.type"
+    name  = "tempo.service.type"
     value = "ClusterIP"
   }
 
   set {
-    name = "prometheus.server.service.type"
+    name  = "prometheus.server.service.type"
     value = "ClusterIP"
   }
 }
@@ -91,7 +93,7 @@ resource "helm_release" "envoy_gateway_addon" {
 resource "kubernetes_manifest" "envoy_gateway_class" {
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1"
-    kind = "GatewayClass"
+    kind       = "GatewayClass"
     metadata = {
       name = "eg"
     }
@@ -104,22 +106,45 @@ resource "kubernetes_manifest" "envoy_gateway_class" {
 resource "kubernetes_manifest" "public_gateway" {
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1"
-    kind = "Gateway"
+    kind       = "Gateway"
     metadata = {
-      name = "gw"
+      name      = "gw"
       namespace = "default"
+      annotations = {
+          "cert-manager.io/cluster-issuer" = "self-signed-cluster-issuer"
+        }
     }
     spec = {
       gatewayClassName = "eg"
       listeners = [
+        # {
+        #   name     = "http"
+        #   hostname = "*.kevharv.com"
+        #   protocol = "HTTP"
+        #   port     = 80
+        #   allowedRoutes = {
+        #     namespaces = {
+        #       from = "All"
+        #     }
+        #   }
+        # },
         {
-          name = "http"
-          protocol = "HTTP"
-          port = 80
+          name = "https"
+          hostname = "*.kevharv.com"
+          protocol = "HTTPS"
+          port = 443
           allowedRoutes = {
             namespaces = {
               from = "All"
             }
+          }
+          tls = {
+            mode = "Terminate"
+            certificateRefs = [
+              {
+                name = "wildcard-kevharv-com-tls"
+              }
+            ]
           }
         }
       ]
@@ -130,24 +155,51 @@ resource "kubernetes_manifest" "public_gateway" {
 
 # ========== Cert Manager ==========
 resource "helm_release" "cert_manager" {
-    name = "cert-manager"
-    repository = "https://charts.jetstack.io"
-    chart = "cert-manager"
-    version = "v1.15.3"
+  name       = "cert-manager"
+  repository = "https://charts.jetstack.io"
+  chart      = "cert-manager"
+  version    = "v1.15.3"
 
-    create_namespace = true
-    namespace = "cert-manager"
+  create_namespace = true
+  namespace        = "cert-manager"
 
-    set {
-        name = "crds.enabled"
-        value = "true"
-    }
+  set {
+    name  = "crds.enabled"
+    value = "true"
+  }
 
-    set {
-        name = "prometheus.enabled"
-        value = "true"
-    }
+  set {
+    name  = "prometheus.enabled"
+    value = "true"
+  }
+
+  set {
+    name = "config.apiVersion"
+    value = "controller.config.cert-manager.io/v1alpha1"
+  }
+
+  set {
+    name = "config.kind"
+    value = "ControllerConfiguration"
+  }
+
+  set {
+    name = "config.enableGatewayAPI"
+    value = "true"
+  }
 }
 
-# To-Do - create ClusterIssuer with self-signed certs for testing, mTLS
+resource "kubernetes_manifest" "self_signed_cluster_issuer" {
+  manifest = {
+    apiVersion = "cert-manager.io/v1"
+    kind       = "ClusterIssuer"
+    metadata = {
+      name      = "self-signed-cluster-issuer"
+    }
+    spec = {
+      selfSigned = {}
+    }
+  }
+}
+
 # To-Do - create ClusterIssuer with DNS01 ACME challenge against Cloudflare
