@@ -88,7 +88,44 @@ resource "helm_release" "envoy_gateway_addon" {
   }
 }
 
-# To-Do - deploy shared Gateway resource
+resource "kubernetes_manifest" "envoy_gateway_class" {
+  manifest = {
+    apiVersion = "gateway.networking.k8s.io/v1"
+    kind = "GatewayClass"
+    metadata = {
+      name = "eg"
+    }
+    spec = {
+      controllerName = "gateway.envoyproxy.io/gatewayclass-controller"
+    }
+  }
+}
+
+resource "kubernetes_manifest" "public_gateway" {
+  manifest = {
+    apiVersion = "gateway.networking.k8s.io/v1"
+    kind = "Gateway"
+    metadata = {
+      name = "gw"
+      namespace = "default"
+    }
+    spec = {
+      gatewayClassName = "eg"
+      listeners = [
+        {
+          name = "http"
+          protocol = "HTTP"
+          port = 80
+          allowedRoutes = {
+            namespaces = {
+              from = "All"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
 
 
 # ========== Cert Manager ==========
