@@ -76,7 +76,7 @@ metadata:
 spec:
   parentRefs:
     - name: gw
-      # namespace: envoy-gateway
+      namespace: default
   hostnames:
     - "k8s.kevharv.com"
   rules:

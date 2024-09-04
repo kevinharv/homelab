@@ -18,7 +18,6 @@ provider "kubernetes" {
   config_path = "~/.kube/config"
 }
 
-# To-Do - variables, mostly for names of various resources (Ex: cert issuer names)
 
 # ========== CNI ==========
 
