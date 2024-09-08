@@ -69,8 +69,10 @@ resource "helm_release" "otel-collector" {
               value: k8s.namespace.name,k8s.pod.name,k8s.container.name
 
       exporters:
-        otlphttp:
+        otlphttp/loki:
           endpoint: "http://loki:3100/otlp"  # Loki endpoint for log ingestion
+        otlphttp/mimir:
+          endpoint: http://mimir-nginx/otlp
 
       service:
         pipelines:
@@ -82,7 +84,15 @@ resource "helm_release" "otel-collector" {
               - resource
               - batch
             exporters:
-              - otlphttp
+              - otlphttp/loki
+          metrics:
+            processors:
+              - memory_limiter
+              - k8sattributes
+              - resource
+              - batch
+            exporters:
+              - otlphttp/mimir
   EOF
   ]
 }
@@ -127,35 +137,33 @@ resource "helm_release" "loki" {
   ]
 }
 
-# resource "helm_release" "mimir" {
-#   name       = "mimir"
-#   namespace  = kubernetes_namespace.observability_namespace.metadata[0].name
-#   repository = "https://grafana.github.io/helm-charts"
-#   chart      = "mimir-distributed"
-#   # version    = "5.5.0-weekly.306"
-#   timeout = 300
+resource "helm_release" "mimir" {
+  name       = "mimir"
+  namespace  = kubernetes_namespace.observability_namespace.metadata[0].name
+  repository = "https://grafana.github.io/helm-charts"
+  chart      = "mimir-distributed"
+  timeout = 300
 
-#   values = [<<-EOF
-#     api:
-#       enable: true
-#     distributor:
-#       replicas: 1
-#     ingester:
-#       replicas: 1
-#     query-frontend:
-#       replicas: 1
-#     querier:
-#       replicas: 1
-#   EOF
-#   ]
-# }
+  values = [<<-EOF
+    api:
+      enable: true
+    distributor:
+      replicas: 1
+    ingester:
+      replicas: 1
+    query-frontend:
+      replicas: 1
+    querier:
+      replicas: 1
+  EOF
+  ]
+}
 
 # resource "helm_release" "tempo" {
 #   name       = "tempo"
 #   namespace  = kubernetes_namespace.observability_namespace.metadata[0].name
 #   repository = "https://grafana.github.io/helm-charts"
 #   chart      = "tempo"
-#   version    = "1.10.3"
 
 #   values = [<<-EOF
 #     config:
@@ -205,11 +213,11 @@ resource "helm_release" "grafana" {
             url: http://loki:3100
             access: proxy
 
-          # - name: Prometheus
-          #   type: prometheus
-          #   url: http://mimir-observability:9009/api/prom
-          #   access: proxy
-          #   isDefault: true
+          - name: Prometheus
+            type: prometheus
+            url: http://mimir-nginx/prometheus
+            access: proxy
+            isDefault: true
 
           # - name: Tempo
           #   type: tempo
