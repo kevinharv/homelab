@@ -35,33 +35,54 @@ resource "helm_release" "otel-collector" {
   version    = "v0.104.0"
 
   cleanup_on_fail = true
+  timeout = 60
 
   create_namespace = false
   namespace        = kubernetes_namespace.observability_namespace.metadata[0].name
 
   values = [<<-EOF
-    mode: deployment
+    mode: daemonset
     image:
       repository: "otel/opentelemetry-collector-k8s"
-    
+
+    presets:
+      hostMetrics:
+        enabled: true
+      kubernetesAttributes:
+        enabled: true
+      kubeletMetrics:
+        enabled: true
+      logsCollection:
+        enabled: true
+
     config:
-      receivers:
-        filelog:
-          include: ["/var/log/containers/*.log"]
+      # receivers:
+      #   filelog:
+      #     include: ["/var/log/containers/*.log"]
 
       processors:
         batch: {}
+        resource:
+          attributes:
+            - action: insert
+              key: loki.resource.labels
+              value: k8s.namespace.name,k8s.pod.name,k8s.container.name
 
       exporters:
         otlphttp:
-          endpoint: "http://loki:3100/otlp/v1/logs"  # Loki endpoint for log ingestion
+          endpoint: "http://loki:3100/otlp"  # Loki endpoint for log ingestion
 
       service:
         pipelines:
           logs:
-            receivers: [filelog]
-            processors: [batch]
-            exporters: [otlphttp]
+            # receivers: [filelog]
+            processors:
+              - memory_limiter
+              - k8sattributes
+              - resource
+              - batch
+            exporters:
+              - otlphttp
   EOF
   ]
 }
@@ -70,16 +91,37 @@ resource "helm_release" "loki" {
   name       = "loki"
   namespace  = kubernetes_namespace.observability_namespace.metadata[0].name
   repository = "https://grafana.github.io/helm-charts"
-  chart      = "loki-stack"
-  version    = "2.10.2"
+  chart      = "loki"
+
 
   values = [<<-EOF
+    deploymentMode: SingleBinary
     loki:
-      persistence:
-        enabled: true
-        size: 1Gi
-        storageClassName: openebs-hostpath
-    promtail:
+      limits_config:
+        allow_structured_metadata: true
+      auth_enabled: false
+      commonConfig:
+        replication_factor: 1
+      storage:
+        type: 'filesystem'
+      schemaConfig:
+        configs:
+        - from: "2024-01-01"
+          store: tsdb
+          index:
+            prefix: loki_index_
+            period: 24h
+          object_store: filesystem # we're storing on filesystem so there's no real persistence here.
+          schema: v13
+    singleBinary:
+      replicas: 1
+    read:
+      replicas: 0
+    backend:
+      replicas: 0
+    write:
+      replicas: 0
+    chunksCache:
       enabled: false
   EOF
   ]
@@ -139,40 +181,39 @@ resource "helm_release" "grafana" {
   namespace  = kubernetes_namespace.observability_namespace.metadata[0].name
   repository = "https://grafana.github.io/helm-charts"
   chart      = "grafana"
-  version    = "8.5.1" # Adjust to latest version
+  version    = "8.5.1" 
 
   values = [<<-EOF
     adminPassword: "admin"
 
+    persistence:
+      enabled: true
+      size: 1Gi
+      storageClassName: openebs-hostpath
+
     service:
       type: ClusterIP
       port: 80
-    
-    grafana.ini:
-      server:
-        httpPort: 80
-        rootUrl: "https://k8s.kevharv.com:32158/grafana/"
-        domain: "https://k8s.kevharv.com:32158/grafana/"
 
     datasources:
       datasources.yaml:
         apiVersion: 1
         datasources:
-          - name: Prometheus
-            type: prometheus
-            url: http://mimir-observability:9009/api/prom
-            access: proxy
-            isDefault: true
-
           - name: Loki
             type: loki
             url: http://loki:3100
             access: proxy
 
-          - name: Tempo
-            type: tempo
-            url: http://tempo:3100
-            access: proxy
+          # - name: Prometheus
+          #   type: prometheus
+          #   url: http://mimir-observability:9009/api/prom
+          #   access: proxy
+          #   isDefault: true
+
+          # - name: Tempo
+          #   type: tempo
+          #   url: http://tempo:3100
+          #   access: proxy
   EOF
   ]
 }
@@ -193,7 +234,7 @@ resource "kubernetes_manifest" "grafana_endpoint" {
         }
       ]
       hostnames = [
-        "k8s.kevharv.com"
+        "grafana.lab.kevharv.com"
       ]
       rules = [
         {
@@ -211,7 +252,7 @@ resource "kubernetes_manifest" "grafana_endpoint" {
             {
               path = {
                 type  = "PathPrefix"
-                value = "/grafana"
+                value = "/"
               }
             }
           ]
