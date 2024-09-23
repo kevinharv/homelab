@@ -17,16 +17,16 @@ provider "kubernetes" {
 }
 
 variable "kc_pg_username" {
-    type = string
+  type = string
 }
 
 variable "kc_pg_password" {
-    type = string
-    sensitive = true
+  type      = string
+  sensitive = true
 }
 
 variable "kc_pg_host" {
-    type = string
+  type = string
 }
 
 variable "kc_pg_database" {
@@ -34,45 +34,121 @@ variable "kc_pg_database" {
 }
 
 
-resource "kubernetes_namespace" "security_namespace" {
-    metadata {
-      name = "security"
-    }
-}
+# resource "kubernetes_namespace" "security_namespace" {
+#   metadata {
+#     name = "security"
+#   }
+# }
 
-resource "helm_release" "keycloak" {
-  name       = "keycloak"
-  namespace  = kubernetes_namespace.security_namespace.metadata[0].name
-  repository = "oci://registry-1.docker.io/bitnamicharts"
-  chart      = "keycloak"
+# resource "helm_release" "keycloak" {
+#   name       = "keycloak"
+#   namespace  = kubernetes_namespace.security_namespace.metadata[0].name
+#   repository = "oci://registry-1.docker.io/bitnamicharts"
+#   chart      = "keycloak"
 
-  cleanup_on_fail = true
+#   cleanup_on_fail = true
 
-  set {
-    name = "postgresql.enabled"
-    value = false
-  }
-  set {
-    name = "externalDatabase.host"
-    value = var.kc_pg_host
-  }
-  set {
-    name = "externalDatabase.user"
-    value = var.kc_pg_username
-  }
-  set {
-    name = "externalDatabase.password"
-    value = var.kc_pg_password
-  }
-  set {
-    name = "externalDatabase.database"
-    value = var.kc_pg_database
-  }
-  set {
-    name = "externalDatabase.port"
-    value = 5432
-  }
-}
+#   set {
+#     name  = "postgresql.enabled"
+#     value = true
+#   }
+#   set {
+#     name  = "auth.adminUser"
+#     value = "admin"
+#   }
+#   set {
+#     name  = "auth.adminPassword"
+#     value = var.kc_pg_password
+#   }
+#   set {
+#     name  = "externalDatabase.host"
+#     value = var.kc_pg_host
+#   }
+#   set {
+#     name  = "externalDatabase.user"
+#     value = var.kc_pg_username
+#   }
+#   set {
+#     name  = "externalDatabase.password"
+#     value = var.kc_pg_password
+#   }
+#   set {
+#     name  = "externalDatabase.database"
+#     value = var.kc_pg_database
+#   }
+#   set {
+#     name  = "externalDatabase.port"
+#     value = 5432
+#   }
+#   set {
+#     name  = "keycloak.extraEnvVars[0].name"
+#     value = "KEYCLOAK_PRODUCTION"
+#   }
+#   set {
+#     name  = "keycloak.extraEnvVars[0].value"
+#     value = "true"
+#   }
+#   set {
+#     name  = "keycloak.extraEnvVars[1].name"
+#     value = "KEYCLOAK_LOGLEVEL"
+#   }
+#   set {
+#     name  = "keycloak.extraEnvVars[1].value"
+#     value = "DEBUG"
+#   }
+#   set {
+#     name  = "keycloak.extraEnvVars[2].name"
+#     value = "KEYCLOAK_AUTO_MIGRATION"
+#   }
+#   set {
+#     name  = "keycloak.extraEnvVars[2].value"
+#     value = "true"
+#   }
+# }
+
+# resource "kubernetes_manifest" "keycloak_endpoint" {
+#   manifest = {
+#     apiVersion = "gateway.networking.k8s.io/v1"
+#     kind       = "HTTPRoute"
+#     metadata = {
+#       name      = "keycloak-route"
+#       namespace = "security"
+#     }
+#     spec = {
+#       parentRefs = [
+#         {
+#           name      = "gw"
+#           namespace = "default"
+#         }
+#       ]
+#       hostnames = [
+#         "keycloak.lab.kevharv.com"
+#       ]
+#       rules = [
+#         {
+#           backendRefs = [
+#             {
+#               group     = ""
+#               kind      = "Service"
+#               name      = "keycloak"
+#               namespace = "security"
+#               port      = 8080
+#               weight    = 1
+#             }
+#           ]
+#           matches = [
+#             {
+#               path = {
+#                 type  = "PathPrefix"
+#                 value = "/"
+#               }
+#             }
+#           ]
+#         }
+#       ]
+#     }
+#   }
+# }
 
 resource "kubernetes_manifest" "keycloak_endpoint" {
   manifest = {
@@ -100,7 +176,7 @@ resource "kubernetes_manifest" "keycloak_endpoint" {
               kind      = "Service"
               name      = "keycloak"
               namespace = "security"
-              port      = 80
+              port      = 8080
               weight    = 1
             }
           ]
@@ -109,6 +185,19 @@ resource "kubernetes_manifest" "keycloak_endpoint" {
               path = {
                 type  = "PathPrefix"
                 value = "/"
+              }
+            }
+          ]
+          filters = [
+            {
+              type = "RequestHeaderModifier"
+              requestHeaderModifier = {
+                add = [
+                  {
+                    name  = "X-Forwarded-Proto"
+                    value = "https"
+                  }
+                ]
               }
             }
           ]
