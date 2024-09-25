@@ -121,17 +121,17 @@ resource "kubernetes_manifest" "public_gateway" {
     spec = {
       gatewayClassName = "eg"
       listeners = [
-        # {
-        #   name     = "http"
-        #   hostname = "*.kevharv.com"
-        #   protocol = "HTTP"
-        #   port     = 80
-        #   allowedRoutes = {
-        #     namespaces = {
-        #       from = "All"
-        #     }
-        #   }
-        # },
+        {
+          name     = "http"
+          hostname = "*.lab.kevharv.com"
+          protocol = "HTTP"
+          port     = 80
+          allowedRoutes = {
+            namespaces = {
+              from = "All"
+            }
+          }
+        },
         {
           name = "https"
           hostname = "*.lab.kevharv.com"

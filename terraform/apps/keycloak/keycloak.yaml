@@ -11,7 +11,7 @@ spec:
       targetPort: 8080
   selector:
     app: keycloak
-  # type: LoadBalancer
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -38,12 +38,12 @@ spec:
               value: "admin"
             - name: KEYCLOAK_ADMIN_PASSWORD
               value: "admin"
-            - name: KC_HOSTNAME
-              value: keycloak.lab.kevharv.com
-            - name: KC_HOSTNAME_PORT
-              value: "32158"
-            - name: KC_HOSTNAME_HTTPS
-              value: "true"
+            # - name: KC_HOSTNAME
+            #   value: keycloak.lab.kevharv.com
+            # - name: KC_HOSTNAME_PORT
+            #   value: "32158"
+            # - name: KC_HOSTNAME_HTTPS
+            #   value: "true"
           ports:
             - name: http
               containerPort: 8080

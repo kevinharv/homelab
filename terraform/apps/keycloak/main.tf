@@ -106,50 +106,6 @@ variable "kc_pg_database" {
 #   }
 # }
 
-# resource "kubernetes_manifest" "keycloak_endpoint" {
-#   manifest = {
-#     apiVersion = "gateway.networking.k8s.io/v1"
-#     kind       = "HTTPRoute"
-#     metadata = {
-#       name      = "keycloak-route"
-#       namespace = "security"
-#     }
-#     spec = {
-#       parentRefs = [
-#         {
-#           name      = "gw"
-#           namespace = "default"
-#         }
-#       ]
-#       hostnames = [
-#         "keycloak.lab.kevharv.com"
-#       ]
-#       rules = [
-#         {
-#           backendRefs = [
-#             {
-#               group     = ""
-#               kind      = "Service"
-#               name      = "keycloak"
-#               namespace = "security"
-#               port      = 8080
-#               weight    = 1
-#             }
-#           ]
-#           matches = [
-#             {
-#               path = {
-#                 type  = "PathPrefix"
-#                 value = "/"
-#               }
-#             }
-#           ]
-#         }
-#       ]
-#     }
-#   }
-# }
-
 resource "kubernetes_manifest" "keycloak_endpoint" {
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1"
@@ -185,19 +141,6 @@ resource "kubernetes_manifest" "keycloak_endpoint" {
               path = {
                 type  = "PathPrefix"
                 value = "/"
-              }
-            }
-          ]
-          filters = [
-            {
-              type = "RequestHeaderModifier"
-              requestHeaderModifier = {
-                add = [
-                  {
-                    name  = "X-Forwarded-Proto"
-                    value = "https"
-                  }
-                ]
               }
             }
           ]
