@@ -1,7 +1,7 @@
 ---
 services:
-    mc-atm9:
-        container_name: mc-atm9
+    mc-springlus:
+        container_name: mc-springlus
         image: itzg/minecraft-server
         tty: true
         stdin_open: true
@@ -9,12 +9,14 @@ services:
         - 25565:25565
         environment:
             EULA: "TRUE"
-            CF_API_KEY: ${API_KEY}
+            MEMORY: "2G"
             TYPE: "AUTO_CURSEFORGE"
-            CF_PAGE_URL: "https://www.curseforge.com/minecraft/modpacks/all-the-mods-9"
-            MEMORY: "4G"
+            CF_API_KEY: ${API_KEY}
+            CF_SLUG: "custom"
+            CF_MODPACK_MANIFEST: /manifests/manifest.json
         volumes:
         - mc-data:/data
+        - ./manifest.json:/manifests/manifest.json:ro
 
 volumes:
     mc-data:

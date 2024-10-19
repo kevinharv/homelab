@@ -1,0 +1,329 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mcsp-manifest
+data:
+  manifest.json: |
+    {
+      "minecraft": {
+        "version": "1.21.1",
+        "modLoaders": [
+          {
+            "id": "neoforge-21.1.66",
+            "primary": true
+          }
+        ]
+      },
+      "manifestType": "minecraftModpack",
+      "manifestVersion": 1,
+      "name": "Springlus SMP",
+      "version": "fuck stealthunner",
+      "author": "",
+      "files": [
+        {
+          "projectID": 619320,
+          "fileID": 5801696,
+          "required": true
+        },
+        {
+          "projectID": 404468,
+          "fileID": 5631446,
+          "required": true
+        },
+        {
+          "projectID": 453925,
+          "fileID": 5635646,
+          "required": true
+        },
+        {
+          "projectID": 533382,
+          "fileID": 5484941,
+          "required": true
+        },
+        {
+          "projectID": 841890,
+          "fileID": 5629395,
+          "required": true
+        },
+        {
+          "projectID": 268566,
+          "fileID": 5680398,
+          "required": true
+        },
+        {
+          "projectID": 268560,
+          "fileID": 5680395,
+          "required": true
+        },
+        {
+          "projectID": 683252,
+          "fileID": 5647329,
+          "required": true
+        },
+        {
+          "projectID": 394468,
+          "fileID": 5726290,
+          "required": true
+        },
+        {
+          "projectID": 324717,
+          "fileID": 5639932,
+          "required": true
+        },
+        {
+          "projectID": 940057,
+          "fileID": 5685546,
+          "required": true
+        },
+        {
+          "projectID": 316582,
+          "fileID": 5816706,
+          "required": true
+        },
+        {
+          "projectID": 502372,
+          "fileID": 5635608,
+          "required": true
+        },
+        {
+          "projectID": 450659,
+          "fileID": 5613197,
+          "required": true
+        },
+        {
+          "projectID": 238222,
+          "fileID": 5802637,
+          "required": true
+        },
+        {
+          "projectID": 618298,
+          "fileID": 5810072,
+          "required": true
+        },
+        {
+          "projectID": 558344,
+          "fileID": 5564551,
+          "required": true
+        },
+        {
+          "projectID": 378646,
+          "fileID": 5635653,
+          "required": true
+        },
+        {
+          "projectID": 508933,
+          "fileID": 5689286,
+          "required": true
+        },
+        {
+          "projectID": 400933,
+          "fileID": 5635670,
+          "required": true
+        },
+        {
+          "projectID": 363569,
+          "fileID": 5635576,
+          "required": true
+        },
+        {
+          "projectID": 404465,
+          "fileID": 5816756,
+          "required": true
+        },
+        {
+          "projectID": 359540,
+          "fileID": 5635588,
+          "required": true
+        },
+        {
+          "projectID": 456956,
+          "fileID": 5813117,
+          "required": true
+        },
+        {
+          "projectID": 419699,
+          "fileID": 5553800,
+          "required": true
+        },
+        {
+          "projectID": 455508,
+          "fileID": 5765375,
+          "required": true
+        },
+        {
+          "projectID": 570073,
+          "fileID": 5793500,
+          "required": true
+        },
+        {
+          "projectID": 314906,
+          "fileID": 5710609,
+          "required": true
+        },
+        {
+          "projectID": 686836,
+          "fileID": 5641277,
+          "required": true
+        },
+        {
+          "projectID": 574300,
+          "fileID": 5664061,
+          "required": true
+        },
+        {
+          "projectID": 351725,
+          "fileID": 5635632,
+          "required": true
+        },
+        {
+          "projectID": 448233,
+          "fileID": 5672103,
+          "required": true
+        },
+        {
+          "projectID": 220318,
+          "fileID": 5812716,
+          "required": true
+        },
+        {
+          "projectID": 398521,
+          "fileID": 5772720,
+          "required": true
+        },
+        {
+          "projectID": 441647,
+          "fileID": 5780907,
+          "required": true
+        },
+        {
+          "projectID": 422301,
+          "fileID": 5787622,
+          "required": true
+        },
+        {
+          "projectID": 32274,
+          "fileID": 5820528,
+          "required": true
+        },
+        {
+          "projectID": 352039,
+          "fileID": 5635594,
+          "required": true
+        },
+        {
+          "projectID": 361276,
+          "fileID": 5816163,
+          "required": true
+        },
+        {
+          "projectID": 485681,
+          "fileID": 5437053,
+          "required": true
+        },
+        {
+          "projectID": 223794,
+          "fileID": 5729094,
+          "required": true
+        },
+        {
+          "projectID": 955399,
+          "fileID": 5660740,
+          "required": true
+        },
+        {
+          "projectID": 605641,
+          "fileID": 5660592,
+          "required": true
+        },
+        {
+          "projectID": 467028,
+          "fileID": 5763815,
+          "required": true
+        }
+      ],
+      "overrides": "overrides"
+    }
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mc-data-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mc-springlus
+spec:
+  serviceName: mc-springlus
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mc-springlus
+  template:
+    metadata:
+      labels:
+        app: mc-springlus
+    spec:
+      containers:
+      - name: mc-springlus
+        image: itzg/minecraft-server
+        ports:
+        - containerPort: 25565
+          name: mc-port
+        env:
+        - name: EULA
+          value: "TRUE"
+        - name: MEMORY
+          value: "2G"
+        - name: TYPE
+          value: "AUTO_CURSEFORGE"
+        - name: CF_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cf-api-key
+              key: API_KEY
+        - name: CF_SLUG
+          value: "custom"
+        - name: CF_MODPACK_MANIFEST
+          value: "/manifests/manifest.json"
+        volumeMounts:
+        - name: mc-data
+          mountPath: /data
+        - name: manifest
+          mountPath: /manifests/manifest.json
+          subPath: manifest.json
+      volumes:
+      - name: mc-data
+        persistentVolumeClaim:
+          claimName: mc-data-pvc
+      - name: manifest
+        configMap:
+          name: mcsp-manifest
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cf-api-key
+type: Opaque
+stringData:
+  API_KEY: ""
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mc-springlus
+spec:
+  selector:
+    app: mc-springlus
+  ports:
+    - protocol: TCP
+      port: 25565
+      targetPort: 25565
+  type: LoadBalancer
