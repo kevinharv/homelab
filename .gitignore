@@ -1,3 +1,4 @@
 .vagrant/*
 .terraform/*
 **secrets*
+ovpn_files/

@@ -1,0 +1,5 @@
+---
+# Install OpenVPN, unzip
+# Download https://www.privateinternetaccess.com/openvpn/openvpn.zip and unzip in /etc/openvpn
+# Run "openvpn <server name>.ovpn"
+# Make sure this runs on startup?

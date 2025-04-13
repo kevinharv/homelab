@@ -123,7 +123,7 @@ resource "kubernetes_manifest" "public_gateway" {
       listeners = [
         {
           name     = "http"
-          hostname = "*.lab.kevharv.com"
+          hostname = "*.kevharv.com"
           protocol = "HTTP"
           port     = 80
           allowedRoutes = {
@@ -134,7 +134,7 @@ resource "kubernetes_manifest" "public_gateway" {
         },
         {
           name = "https"
-          hostname = "*.lab.kevharv.com"
+          hostname = "*.kevharv.com"
           protocol = "HTTPS"
           port = 443
           allowedRoutes = {
@@ -146,7 +146,7 @@ resource "kubernetes_manifest" "public_gateway" {
             mode = "Terminate"
             certificateRefs = [
               {
-                name = "wildcard-lab-kevharv-com-tls"
+                name = "wildcard-kevharv-com-tls"
               }
             ]
           }

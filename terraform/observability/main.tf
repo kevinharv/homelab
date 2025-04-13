@@ -35,7 +35,7 @@ resource "helm_release" "otel-collector" {
   version    = "v0.104.0"
 
   cleanup_on_fail = true
-  timeout = 60
+  timeout         = 60
 
   create_namespace = false
   namespace        = kubernetes_namespace.observability_namespace.metadata[0].name
@@ -142,7 +142,7 @@ resource "helm_release" "mimir" {
   namespace  = kubernetes_namespace.observability_namespace.metadata[0].name
   repository = "https://grafana.github.io/helm-charts"
   chart      = "mimir-distributed"
-  timeout = 300
+  timeout    = 300
 
   values = [<<-EOF
     api:
@@ -164,33 +164,40 @@ resource "helm_release" "mimir" {
 #   namespace  = kubernetes_namespace.observability_namespace.metadata[0].name
 #   repository = "https://grafana.github.io/helm-charts"
 #   chart      = "tempo"
+#   timeout    = 120
 
-#   values = [<<-EOF
-#     config:
-#       distributor:
-#         ring:
-#           kvstore:
-#             store: inmemory
-#       ingester:
-#         lifecycler:
+#   values = [
+#     yamlencode({
+#       config = <<-EOT
+#         distributor:
 #           ring:
 #             kvstore:
 #               store: inmemory
-#       compactor:
-#         ring:
-#           kvstore:
-#             store: inmemory
-#   EOF
+#         ingester:
+#           lifecycler:
+#             ring:
+#               kvstore:
+#                 store: inmemory
+#         compactor:
+#           ring:
+#             kvstore:
+#               store: inmemory
+#         server:
+#           http_listen_port: 8080
+#       EOT
+#     })
 #   ]
 # }
 
 # Deploy Grafana for visualization
 resource "helm_release" "grafana" {
-  name       = "grafana"
-  namespace  = kubernetes_namespace.observability_namespace.metadata[0].name
-  repository = "https://grafana.github.io/helm-charts"
-  chart      = "grafana"
-  version    = "8.5.1" 
+  name            = "grafana"
+  namespace       = kubernetes_namespace.observability_namespace.metadata[0].name
+  repository      = "https://grafana.github.io/helm-charts"
+  chart           = "grafana"
+  version         = "8.5.1"
+  timeout         = 45
+  cleanup_on_fail = true
 
   values = [<<-EOF
     adminPassword: "admin"
@@ -219,10 +226,10 @@ resource "helm_release" "grafana" {
             access: proxy
             isDefault: true
 
-          # - name: Tempo
-          #   type: tempo
-          #   url: http://tempo:3100
-          #   access: proxy
+          - name: Tempo
+            type: tempo
+            url: http://tempo:3100
+            access: proxy
   EOF
   ]
 }
@@ -243,7 +250,7 @@ resource "kubernetes_manifest" "grafana_endpoint" {
         }
       ]
       hostnames = [
-        "grafana.lab.kevharv.com"
+        "grafana.kevharv.com"
       ]
       rules = [
         {

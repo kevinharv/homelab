@@ -1,6 +1,6 @@
 ---
 - name: Common Configuration
-  hosts: all
+  hosts: PRDCNT1
   become: true
   roles:
   - roles/common

@@ -122,7 +122,7 @@ resource "kubernetes_manifest" "keycloak_endpoint" {
         }
       ]
       hostnames = [
-        "keycloak.lab.kevharv.com"
+        "keycloak.kevharv.com"
       ]
       rules = [
         {
