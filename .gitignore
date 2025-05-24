@@ -1,4 +1,6 @@
 .vagrant/*
-.terraform/*
-**secrets*
+.terraform*
+secrets.auto.tfvars
 ovpn_files/
+.vscode/
+terraform.tfstate*

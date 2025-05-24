@@ -1,0 +1,14 @@
+---
+edit_on_github:
+  repository: github.com/kevinharv/homelab
+  branch: main
+  path_prefix: "minecraft_collection"
+
+extra_links:
+  - description: Report an issue
+    url: https://github.com/kevinharv/homelab/issues/new/choose
+
+communication:
+  forum:
+    - topic: GitHub Issues
+      url: https://github.com/kevinharv/homelab/issues

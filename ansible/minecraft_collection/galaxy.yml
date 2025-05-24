@@ -1,0 +1,31 @@
+---
+# This collection is initialized by https://github.com/ansible/ansible-creator 25.4.1
+
+# See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
+
+namespace: "kevinharv"
+name: "minecraft"
+version: 0.1.0
+readme: README.md
+authors:
+  - Kevin Harvey
+
+description: Tooling for deploying and managing Minecraft servers.
+license_file: LICENSE
+
+tags: ["linux", "minecraft", "rhel", "rocky", "java", "paper"]
+
+dependencies:
+  "ansible.posix": "*"
+
+
+repository: https://github.com/kevinharv/homelab
+documentation: https://github.com/kevinharv/homelab/minecraft_collection/README.md
+homepage: https://minecraft.net
+issues: https://github.com/kevinharv/homelab/issues
+
+build_ignore:
+  - .gitignore
+  - changelogs/.plugin-cache.yaml
+  - venv/
+  - .vscode/

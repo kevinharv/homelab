@@ -1,0 +1,2 @@
+# Collection Python requirements
+rcon==2.4.9

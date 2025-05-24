@@ -1,0 +1,15 @@
+---
+- name: Install Minecraft Java Server
+  hosts: all
+  gather_facts: true
+  tags:
+    - deploy
+    - configure
+
+  vars:
+    foo: bar
+
+  tasks:
+    - name: DEBUG - Start of Playbook
+      ansible.builtin.debug:
+        msg: Start of playbook!

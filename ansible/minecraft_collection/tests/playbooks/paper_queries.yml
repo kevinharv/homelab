@@ -1,0 +1,32 @@
+---
+- name: Make queries against PaperMC API
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    mc_server_version: 1.21.4
+
+  tasks:
+    - name: Get Latest PaperMC Metadata for Minecraft {{ mc_server_version }}
+      ansible.builtin.uri:
+        url: https://api.papermc.io/v2/projects/paper/versions/{{ mc_server_version }}/builds/
+        method: GET
+      register: papermc_api_result
+
+    - name: Set Latest PaperMC Build
+      ansible.builtin.set_fact:
+        papermc_latest: "{{ papermc_api_result.json.builds | last }}"
+
+    - name: DEBUG - Display PaperMC Information
+      ansible.builtin.debug:
+        msg: "{{ papermc_latest }}"
+
+    - name: Get Latest PaperMC Build
+      ansible.builtin.set_fact:
+        papermc_build: "{{ papermc_latest.build }}"
+        papermc_filename: "{{ papermc_latest.downloads.application.name }}"
+        papermc_checksum: "{{ papermc_latest.downloads.application.sha256 }}"
+
+    - name: DEBUG - Display PaperMC Information
+      ansible.builtin.debug:
+        msg: "Build: {{ papermc_build }} | Filename: {{ papermc_filename }} | Checksum: {{ papermc_checksum }}"

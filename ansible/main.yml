@@ -1,6 +1,6 @@
 ---
-- name: Common Configuration
-  hosts: PRDCNT1
+- name: Apply Common Configuration to All Servers
+  hosts: all
   become: true
   roles:
-  - roles/common
+    - common

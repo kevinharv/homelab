@@ -1,0 +1,154 @@
+# TODO
+# - support uninstall
+# - support upgrade
+# - add pre-check asserts
+---
+- name: Create Service Account Group
+  ansible.builtin.group:
+    name: "{{ server_user_group }}"
+    gid: "{{ server_gid | default(omit) }}"
+    state: present
+
+- name: Create Service Account
+  ansible.builtin.user:
+    name: "{{ server_user }}"
+    group: "{{ server_user_group }}"
+    uid: "{{ server_user_uid | default(omit) }}"
+    # home: "{{ server_user_homedir | default(omit) }}"
+    create_home: false
+    state: present
+
+- name: Create Server Directory
+  ansible.builtin.file:
+    path: "{{ server_install_path }}"
+    state: directory
+    owner: "{{ server_user }}"
+    group: "{{ server_user_group }}"
+    mode: '0755'
+
+# TODO - download and install custom Java runtime
+- name: Install Java Runtime
+  ansible.builtin.package:
+    name: java-21-openjdk
+    state: present
+
+
+# ========= SELinux Section =========
+
+
+- name: Install SELinux Policy Utilities
+  ansible.builtin.package:
+    name: policycoreutils-python-utils
+
+- name: Set SELinux Context on {{ server_install_path }}
+  ansible.builtin.command:
+    cmd: semanage fcontext -a -t usr_t "{{ server_install_path }}(/.*)?"
+    creates: /etc/selinux/targeted/contexts/files/file_contexts.local
+
+- name: Apply SELinux Context on {{ server_install_path }}
+  ansible.builtin.command:
+    cmd: restorecon -Rv {{ server_install_path }}
+
+# - name: Allow Minecraft Game Port in SELinux
+#   community.general.seport:
+#     ports: "{{ server_port }}"
+#     proto: tcp
+#     setype: minecraft_port_t
+#     state: present
+
+# - name: Allow Minecraft RCON Port in SELinux
+#   community.general.seport:
+#     ports: "{{ server_rcon_port }}"
+#     proto: tcp
+#     setype: minecraft_port_t
+#     state: present
+
+
+# ========= PaperMC Server Install Section =========
+
+
+# TODO - skip when version override present
+- name: Get Latest PaperMC Metadata for Minecraft {{ server_version }}
+  ansible.builtin.uri:
+    url: https://api.papermc.io/v2/projects/paper/versions/{{ server_version }}/builds/
+    method: GET
+  register: papermc_api_result
+
+- name: Get Latest PaperMC Build
+  ansible.builtin.set_fact:
+    papermc_latest: "{{ papermc_api_result.json.builds | last }}"
+
+- name: Get PaperMC Build Information
+  ansible.builtin.set_fact:
+    papermc_build: "{{ papermc_latest.build }}"
+    papermc_filename: "{{ papermc_latest.downloads.application.name }}"
+    papermc_checksum: "{{ papermc_latest.downloads.application.sha256 }}"
+
+- name: Download PaperMC Server JAR
+  ansible.builtin.get_url:
+    url: https://api.papermc.io/v2/projects/paper/versions/{{ server_version }}/builds/{{ papermc_build }}/downloads/{{ papermc_filename }}
+    dest: "{{ server_install_path }}/{{ papermc_filename }}"
+    checksum: "sha256:{{ papermc_checksum }}"
+    owner: "{{ server_user }}"
+    group: "{{ server_user_group }}"
+    mode: '0644'
+
+
+# ========= Server Configuration Section =========
+
+
+- name: Copy server.properties
+  ansible.builtin.template:
+    src: templates/server.properties.j2
+    dest: "{{ server_install_path }}/server.properties"
+    owner: "{{ server_user }}"
+    group: "{{ server_user_group }}"
+    mode: '0600'
+    backup: true
+
+- name: Copy eula.txt
+  ansible.builtin.template:
+    src: templates/eula.txt.j2
+    dest: "{{ server_install_path }}/eula.txt"
+    owner: "{{ server_user }}"
+    group: "{{ server_user_group }}"
+    mode: '0644'
+
+- name: Download Server Icon
+  ansible.builtin.get_url:
+    url: "{{ server_icon_url }}"
+    dest: "{{ server_install_path }}/server-icon.png"
+    owner: "{{ server_user }}"
+    group: "{{ server_user_group }}"
+    mode: '0644'
+  when: server_icon_url is defined
+
+
+# ========= Finish Host Configuration =========
+
+- name: Install systemd Service
+  ansible.builtin.template:
+    src: templates/minecraft-server.service.j2
+    dest: /etc/systemd/system/{{ server_service_name }}.service
+    owner: root
+    group: root
+    backup: true
+
+- name: Open Firewall Port - Game
+  ansible.posix.firewalld:
+    port: 25565/tcp
+    permanent: true
+    state: enabled
+
+- name: Open Firewall Port - RCON
+  ansible.posix.firewalld:
+    port: 25575/tcp
+    permanent: true
+    state: enabled
+
+- name: Start systemd Service
+  ansible.builtin.systemd:
+    name: "{{ server_service_name }}.service"
+    state: started
+    enabled: true
+    daemon_reload: true

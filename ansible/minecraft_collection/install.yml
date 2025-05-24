@@ -1,0 +1,15 @@
+---
+- name: Install Minecraft Server
+  hosts: sbxmc01
+  gather_facts: true
+  become: true
+
+  vars:
+    server_eula: true
+    # server_icon_url: foo
+
+  tasks:
+    - name: Install Minecraft Server
+      ansible.builtin.include_role:
+        name: server
+  

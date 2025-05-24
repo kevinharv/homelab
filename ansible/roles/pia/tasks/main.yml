@@ -1,5 +1,32 @@
 ---
 # Install OpenVPN, unzip
 # Download https://www.privateinternetaccess.com/openvpn/openvpn.zip and unzip in /etc/openvpn
-# Run "openvpn <server name>.ovpn"
+# Run "openvpn <server name>.ovpn --username=<username> --password=<password>"
 # Make sure this runs on startup?
+
+# Or do I run this in a LXC container?
+
+- name: Install Required Packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - openvpn
+    - unzip
+
+- name: Download PIA OpenVPN Configuration Files
+  ansible.builtin.unarchive:
+    src: "{{ pia_ovpn_configs_url }}"
+    dest: /etc/openvpn
+    remote_src: true
+    mode: "0644"
+    list_files: true
+  register: config_files
+
+- name: INFO - Available Configuration Files
+  ansible.builtin.debug:
+    msg: "{{ config_files }}"
+
+# Copy systemd definition
+# Reload systemd daemon
+# Enable and start PIA systemd service

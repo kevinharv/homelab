@@ -1,0 +1,4 @@
+---
+pia_enabled: true
+pia_state: started
+pia_ovpn_configs_url: "https://www.privateinternetaccess.com/openvpn/openvpn.zip"

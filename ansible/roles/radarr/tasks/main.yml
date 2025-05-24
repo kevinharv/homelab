@@ -1,7 +1,8 @@
 ---
-# Assert Docker/Podman running
-# Install Radarr container compose
+# Install / Start Podman
+# Assert Podman running
+# Download any configuration files for Radarr
 # Bring up containers
-# Configure firewall rules
+# Configure firewall rules (port 7878)
 
 # https://radarr.video/#downloads-docker
