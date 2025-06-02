@@ -1,0 +1,15 @@
+---
+- name: Virtual Workstation Packer Build Provisioner
+  hosts: all
+  gather_facts: true
+
+  vars:
+    foo: bar
+
+  tasks:
+    - name: Assert True
+      ansible.builtin.assert:
+        - true is true
+
+    # Install SSH public key
+    # Update everything

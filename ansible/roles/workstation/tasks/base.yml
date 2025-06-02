@@ -1,0 +1,49 @@
+---
+- name: Install Common Packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ common_packages }}"
+
+- name: Set Message of the Day (/etc/motd)
+  ansible.builtin.template:
+    src: templates/motd.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: 0644
+    backup: false
+
+- name: Set Pre-Authentication Banner (/etc/banner)
+  ansible.builtin.template:
+    src: templates/banner.j2
+    dest: /etc/banner
+    owner: root
+    group: root
+    mode: 0644
+    backup: false
+
+- name: Append SSHD Configuration - Banner
+  ansible.builtin.template:
+    src: templates/sshd_banner.conf.j2
+    dest: /etc/ssh/sshd_config.d/sshd_banner.conf
+    owner: root
+    group: root
+    mode: 0600
+    backup: false
+  notify: restart-sshd
+
+- name: Append SSHD Configuration - Disable Password Authentication
+  ansible.builtin.template:
+    src: templates/sshd_password_auth.conf.j2
+    dest: /etc/ssh/sshd_config.d/sshd_password_auth.conf
+    owner: root
+    group: root
+    mode: 0600
+    backup: false
+  notify: restart-sshd
+
+- name: Install QEMU Guest Agent
+  ansible.builtin.package:
+    name: qemu-guest-agent
+    state: present

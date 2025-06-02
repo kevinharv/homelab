@@ -1,0 +1,16 @@
+---
+- name: Virtual Workstation Post-Provisioning Configuration
+  hosts: all
+  gather_facts: true
+
+  vars:
+    foo: bar
+
+  tasks:
+    - name: Install Updates
+      ansible.builtin.package:
+        name: "*"
+        state: latest
+
+    # Call role for everything else
+        

@@ -1,0 +1,10 @@
+---
+- name: Apply Baseline Configuration
+  ansible.builtin.include_tasks:
+    file: base.yml
+
+# To-Do - include tasks to configure GUI, RDP, networking, etc.
+# To-Do - include tasks to setup development environment
+# - Docker
+# - Dev tools
+# - See README
