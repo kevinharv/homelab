@@ -13,6 +13,11 @@ all:
       ansible_become_password: "{{ linode_become_pass }}"
       ansible_ssh_private_key_file: "~/.ssh/prox_lab"
       ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    devwks1:
+      ansible_host: 192.168.1.248
+      ansible_ssh_user: kevin
+      ansible_become_password: "{{ default_become_password }}"
+      ansible_ssh_private_key_file: ~/.ssh/prox_lab
 kubernetes:
   hosts:
     PRDKUBCP1:

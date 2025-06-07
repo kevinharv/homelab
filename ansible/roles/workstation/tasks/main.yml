@@ -3,8 +3,78 @@
   ansible.builtin.include_tasks:
     file: base.yml
 
-# To-Do - include tasks to configure GUI, RDP, networking, etc.
-# To-Do - include tasks to setup development environment
-# - Docker
-# - Dev tools
-# - See README
+- name: Download Google Chrome GPG Key
+  ansible.builtin.get_url:
+    url: https://dl.google.com/linux/linux_signing_key.pub
+    dest: /tmp/google-chrome.asc
+    mode: '0644'
+
+- name: Convert and Install Google Chrome GPG Key
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg /tmp/google-chrome.asc
+  args:
+    creates: /usr/share/keyrings/google-chrome.gpg
+
+- name: Add Google Chrome Repository
+  ansible.builtin.apt_repository:
+    repo: deb [arch={{ "amd64" if ansible_architecture == "x86_64" else "arm64" }} signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main
+    state: present
+    filename: google-chrome
+
+- name: Download Microsoft GPG Key
+  ansible.builtin.get_url:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    dest: /tmp/microsoft.asc
+    mode: '0644'
+
+- name: Convert and Install Microsoft GPG Key
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /usr/share/keyrings/microsoft.gpg /tmp/microsoft.asc
+  args:
+    creates: /usr/share/keyrings/microsoft.gpg
+
+- name: Add VS Code Repository
+  ansible.builtin.apt_repository:
+    repo: deb [arch={{ "amd64" if ansible_architecture == "x86_64" else "arm64" }} signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main
+    state: present
+    filename: vscode
+  
+- name: Get HashiCorp GPG Key
+  ansible.builtin.get_url:
+    url: https://apt.releases.hashicorp.com/gpg
+    dest: /tmp/hashicorp-archive-keyring.asc
+
+- name: Convert and Install HashiCorp GPG Key
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg /tmp/hashicorp-archive-keyring.asc
+  args:
+    creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+# - name: Add HashiCorp Repository
+#   ansible.builtin.apt_repository:
+#     # repo: deb [arch={{ "amd64" if ansible_architecture == "x86_64" else "arm64" }} signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main
+#     repo: deb [arch={{ "amd64" if ansible_architecture == "x86_64" else "arm64" }} signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com plucky main
+#     filename: hashicorp
+#     state: present
+
+- name: Install Developer Packages
+  ansible.builtin.package:
+    name: "{{ package_name }}"
+    state: latest
+  loop: "{{ dev_packages }}"
+  loop_control:
+    loop_var: package_name
+
+- name: Install Python pip Packages
+  ansible.builtin.pip:
+    name: "{{ package_name }}"
+    state: present
+    executable: pipx
+  loop: "{{ pip_packages }}"
+  loop_control:
+    loop_var: package_name
+
+- name: Clone Dotfiles
+  ansible.builtin.git:
+    repo: https://github.com/kevinharv/.dotfiles.git
+    dest: /home/{{ ansible_user }}/.dotfiles

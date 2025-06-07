@@ -1,10 +1,8 @@
 ---
 - name: Virtual Workstation Post-Provisioning Configuration
-  hosts: all
+  hosts: devwks1
   gather_facts: true
-
-  vars:
-    foo: bar
+  become: true
 
   tasks:
     - name: Install Updates
@@ -12,5 +10,7 @@
         name: "*"
         state: latest
 
-    # Call role for everything else
+    - name: Apply Workstation Baseline
+      ansible.builtin.include_role:
+        name: workstation 
         

@@ -1,4 +1,23 @@
 ---
 common_packages:
   - tree
+  - curl
+  - vim
+dev_packages:
+  - git
   - fastfetch
+  - golang-1.24
+  - python3.13
+  - python3-pip
+  - pipx
+  - nodejs
+  - openjdk-24-jdk
+  - awscli  # To-Do - install from snap
+  - stow
+  # - terraform
+  # - packer
+  - docker.io
+  - google-chrome-stable
+  - code
+pip_packages:
+  - ansible
