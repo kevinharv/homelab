@@ -1,2 +1,5 @@
 ---
-# handlers file for kevinharv.minecraft.run
+- name: restart-minecraft
+  ansible.builtin.systemd:
+    name: "{{ server_service_name }}"
+    state: restarted

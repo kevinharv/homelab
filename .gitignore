@@ -4,3 +4,4 @@ secrets.auto.tfvars
 ovpn_files/
 .vscode/
 terraform.tfstate*
+.ansible/

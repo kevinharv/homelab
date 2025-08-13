@@ -1,0 +1,27 @@
+---
+- name: Get Active Players
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    # ansible_python_interpreter: /home/kevin/homelab/ansible/minecraft_collection/.venv/bin/python
+
+  tasks:
+    - name: Get Active Players
+      players:
+        host: 192.168.1.31
+        port: 25575
+        password: changeme!
+      register: result
+
+    - debug:
+        msg: "There are {{ result.online }} players online!"
+
+    - name: Op __danger
+      op:
+        host: 192.168.1.31
+        port: 25575
+        password: changeme!
+        username: __danger
+        state: present
+      register: op_res

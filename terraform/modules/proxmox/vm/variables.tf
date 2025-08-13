@@ -68,7 +68,7 @@ variable "storage_pool" {
 variable "disk_gb" {
   description = "Proxmox VM Disk Size"
   type = number
-  default = 30
+  default = 32
 }
 
 variable "network_bridge" {

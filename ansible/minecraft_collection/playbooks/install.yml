@@ -11,5 +11,5 @@
   tasks:
     - name: Install Minecraft Server
       ansible.builtin.include_role:
-        name: server
+        name: ../roles/server
   

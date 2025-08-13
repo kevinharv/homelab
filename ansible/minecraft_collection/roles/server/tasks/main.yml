@@ -14,7 +14,6 @@
     name: "{{ server_user }}"
     group: "{{ server_user_group }}"
     uid: "{{ server_user_uid | default(omit) }}"
-    # home: "{{ server_user_homedir | default(omit) }}"
     create_home: false
     state: present
 
@@ -48,21 +47,6 @@
 - name: Apply SELinux Context on {{ server_install_path }}
   ansible.builtin.command:
     cmd: restorecon -Rv {{ server_install_path }}
-
-# - name: Allow Minecraft Game Port in SELinux
-#   community.general.seport:
-#     ports: "{{ server_port }}"
-#     proto: tcp
-#     setype: minecraft_port_t
-#     state: present
-
-# - name: Allow Minecraft RCON Port in SELinux
-#   community.general.seport:
-#     ports: "{{ server_rcon_port }}"
-#     proto: tcp
-#     setype: minecraft_port_t
-#     state: present
-
 
 # ========= PaperMC Server Install Section =========
 
@@ -148,7 +132,7 @@
 
 - name: Start systemd Service
   ansible.builtin.systemd:
-    name: "{{ server_service_name }}.service"
+    name: "{{ server_service_name }}"
     state: started
     enabled: true
     daemon_reload: true

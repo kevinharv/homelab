@@ -1,14 +1,14 @@
-# sample_lookup.py - A custom lookup plugin for Ansible.
+# players.py - A custom lookup plugin for Ansible.
 
 # pylint: disable=E0401
-# sample_lookup.py - A custom lookup plugin for Ansible.
+# players.py - A custom lookup plugin for Ansible.
 # Author: Your Name (@username)
 # Copyright 2020 Red Hat
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 DOCUMENTATION = """
-    name: sample_lookup
+    name: players
     author: Your Name (@username)
     version_added: "1.0.0"
     short_description: A custom lookup plugin for Ansible.
@@ -23,9 +23,9 @@ DOCUMENTATION = """
 """
 
 EXAMPLES = """
-- name: Example usage of sample_lookup
+- name: Example usage of players
   ansible.builtin.debug:
-    msg: "{{ lookup('sample_lookup', 'example_term') }}"
+    msg: "{{ lookup('players', 'example_term') }}"
 """
 
 RETURN = """
@@ -39,6 +39,14 @@ from typing import Any, Dict, List, Optional
 from ansible.errors import AnsibleError  # type: ignore
 from ansible.plugins.lookup import LookupBase  # type: ignore
 from ansible.utils.display import Display  # type: ignore
+# from rcon.source import Client
+import sys
+print(">>> Plugin running under Python:", sys.executable)
+
+try:
+    from rcon.source import Client
+except ImportError as e:
+    raise AnsibleError("The 'rcon' Python module is required. Install it with: pip install rcon")
 
 display = Display()
 
@@ -54,7 +62,7 @@ class LookupModule(LookupBase):  # type: ignore[misc]
         terms: List[str],
         variables: Optional[Dict[str, Any]] = None,
         **kwargs: Dict[str, Any],
-    ) -> list[str]:
+    ) -> List[object]:
         """
         Run the lookup with the specified terms.
 
@@ -69,17 +77,34 @@ class LookupModule(LookupBase):  # type: ignore[misc]
         Raises:
             AnsibleError: If the 'terms' parameter is not a list.
         """
-        if not isinstance(terms, list):
-            raise AnsibleError("The 'terms' parameter must be a list.")
+        display.vvv(f"terms: {terms}, variables: {variables}")
 
-        display.vvv(f"Running sample_lookup lookup plugin with terms: {terms}")
+        if not isinstance(terms, List):
+            raise AnsibleError("The 'terms' parameter must be a list.")
+        
+        if len(terms) == 0:
+            terms = ["current"]
+        
+        if terms[0] not in ["current", "max"]:
+            raise AnsibleError("Player count lookup mode must be 'current' or 'max'.")
+
+        display.vvv(f"Getting the {terms} number of players.")
+
+        ansible_host = variables.get('ansible_host')
+        ansible_port = variables.get('ansible_port')
+        ansible_password = variables.get('ansible_password')
 
         try:
-            # Example processing logic - Replace this with actual lookup code
-            result = [term.upper() for term in terms]
+            with Client(ansible_host, ansible_port, passwd=ansible_password) as client:
+                response = client.run('list')
+                response_arr = response.split()
+                players_online = int(response_arr[2])
+                max_players = int(response_arr[7])
 
-            display.vvv(f"Result from sample_lookup lookup: {result}")
-            return result
+            return [{
+                "online": players_online,
+                "max": max_players
+            }]
 
         except Exception as e:
-            raise AnsibleError(f"Error in sample_lookup plugin: {e}") from e
+            raise AnsibleError(f"Error in players plugin: {e}") from e
