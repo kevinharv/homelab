@@ -11,8 +11,4 @@ pip install -r requirements.txt -t package/
 
 echo "Zipping function..."
 cd package
-zip -r ../function.zip .
-cd ..
-zip -g function.zip app.py
-
-echo "Build complete: function.zip"
+zip -r ../function.zip src/

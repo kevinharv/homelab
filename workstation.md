@@ -37,7 +37,4 @@ Create Ubuntu 25.04 (for now) virtual development workstation with RDP enabled. 
     - Ansible
     - Packer
     - Terraform
-- Misc. software
-    - Fastfetch (and customize it)
-
 - RDP server (for Wayland)

@@ -3,7 +3,7 @@
 */
 
 module "dev_box" {
-  source = "../../modules/proxmox/vm"
+  source = "./modules/vm"
 
   vmid = 501
   name = "sdbxdev1"
