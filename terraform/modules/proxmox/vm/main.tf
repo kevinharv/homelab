@@ -36,8 +36,6 @@ resource "proxmox_vm_qemu" "vm" {
   searchdomain = "kevharv.com"
   nameserver   = var.dns_server
 
-  bootdisk = "virtio0"
-
   # VM Hardware Configuration
   cpu {
     cores   = var.cpus
