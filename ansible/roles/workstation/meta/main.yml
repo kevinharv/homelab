@@ -7,6 +7,6 @@ galaxy_info:
   platforms:
   - name: Ubuntu
     versions:
-    - 25.04
+    - 24.04
 
-  galaxy_tags: ["common", "rocky"]
+  galaxy_tags: ["common", "ubuntu"]

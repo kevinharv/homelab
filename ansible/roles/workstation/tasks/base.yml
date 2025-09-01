@@ -47,3 +47,4 @@
   ansible.builtin.package:
     name: qemu-guest-agent
     state: present
+  when: ansible_virtualization_role == 'guest'

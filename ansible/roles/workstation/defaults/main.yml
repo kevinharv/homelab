@@ -12,10 +12,10 @@ dev_packages:
   - pipx
   - nodejs
   - openjdk-24-jdk
-  - awscli  # To-Do - install from snap
+  # - awscli  # To-Do - install from snap
   - stow
-  # - terraform
-  # - packer
+  - terraform
+  - packer
   - docker.io
   - google-chrome-stable
   - code
