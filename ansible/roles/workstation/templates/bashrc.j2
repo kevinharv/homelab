@@ -1,0 +1,14 @@
+alias ls="ls -lG --color=auto"
+alias ll="ls -lH"
+alias la="ls -lah"
+
+parse_git_branch() {
+    git branch 2>/dev/null | sed -n -e 's/^\* \(.*\)/[\1]/p'
+}
+
+# Bash prompt with username, cwd, git branch, and color
+PS1='\[\e[0;37m\]\u\[\e[0m\] \[\e[0;36m\]\w\[\e[0m\] \[\e[0;32m\]$(parse_git_branch)\[\e[0m\] \$ '
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"

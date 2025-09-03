@@ -4,20 +4,30 @@ common_packages:
   - curl
   - vim
 dev_packages:
+  - ansible
   - git
-  - fastfetch
-  - golang-1.24
-  - python3.13
+  - firefox
+  - golang-1.23
+  - python3.12
   - python3-pip
   - pipx
   - nodejs
-  - openjdk-24-jdk
-  # - awscli  # To-Do - install from snap
+  - openjdk-21-jdk
   - stow
   - terraform
   - packer
   - docker.io
   - google-chrome-stable
   - code
-pip_packages:
-  - ansible
+  - spotify-client
+  - vlc
+snap_packages:
+  - name: discord
+  - name: aws-cli
+    classic: true
+  - name: drawio
+  - name: postman
+  - name: steam
+  - name: blender
+    classic: true
+pip_packages: []

@@ -1,6 +1,6 @@
 ---
 - name: Virtual Workstation Post-Provisioning Configuration
-  hosts: devwks1
+  hosts: kevwksubu
   gather_facts: true
   become: true
 
@@ -12,5 +12,21 @@
 
     - name: Apply Workstation Baseline
       ansible.builtin.include_role:
-        name: workstation 
+        name: workstation
+
+    - name: Create Caitlin's Account
+      ansible.builtin.user:
+        name: caitlin
+        comment: Caitlin Harvey
+        shell: /bin/bash
+        home: /home/caitlin
+        state: present
+
+    # TODO
+    # - create autoinstall.yml for automatic Ubuntu installation
+    # - automatically stow dotfiles
+    # - more apps
+    #   - Steam
+    #   - Blender
+    #   - Unreal Engine 5 (Epic Games launcher)
         

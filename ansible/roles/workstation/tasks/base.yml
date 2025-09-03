@@ -43,6 +43,43 @@
     backup: false
   notify: restart-sshd
 
+- name: Install bashrc (system-level)
+  ansible.builtin.template:
+    src: templates/bashrc.j2
+    dest: /etc/bash.bashrc
+    owner: root
+    group: root
+    mode: 0644
+    backup: true
+
+- name: Install bashrc (running-user)
+  ansible.builtin.template:
+    src: templates/bashrc.j2
+    dest: /home/{{ ansible_user }}/.bashrc
+    backup: true
+  become: false
+
+- name: Install gitconfig
+  ansible.builtin.template:
+    src: templates/gitconfig.j2
+    dest: /home/{{ ansible_user }}/.gitconfig
+    backup: true
+  become: false
+
+- name: Remove Extra Directories
+  ansible.builtin.file:
+    path: /home/{{ ansible_user }}/{{ directory }}
+    state: absent
+  become: false
+  loop:
+    - Music
+    - Pictures
+    - Public
+    - Templates
+    - Videos
+  loop_control:
+    loop_var: directory
+
 - name: Install QEMU Guest Agent
   ansible.builtin.package:
     name: qemu-guest-agent

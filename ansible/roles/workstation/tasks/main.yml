@@ -56,6 +56,23 @@
     filename: hashicorp
     state: present
 
+- name: Get Spotify GPG Key
+  ansible.builtin.get_url:
+    url: https://download.spotify.com/debian/pubkey_C85668DF69375001.gpg
+    dest: /tmp/spotify.gpg
+
+- name: Convert and Install Spotify GPG Key
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /usr/share/keyrings/spotify.gpg /tmp/spotify.gpg
+  args:
+    creates: /usr/share/keyrings/spotify.gpg
+
+- name: Add Spotify Repository
+  ansible.builtin.apt_repository:
+    repo: deb [arch={{ "amd64" if ansible_architecture == "x86_64" else "arm64" }} signed-by=/usr/share/keyrings/spotify.gpg] https://repository.spotify.com stable non-free
+    filename: spotify
+    state: present
+
 - name: Install Developer Packages
   ansible.builtin.package:
     name: "{{ package_name }}"
@@ -72,6 +89,16 @@
   loop: "{{ pip_packages }}"
   loop_control:
     loop_var: package_name
+
+- name: Install Snap Packages
+  community.general.snap:
+    name: "{{ package.name }}"
+    classic: "{{ package.classic | default(omit) }}"
+    state: present
+  loop: "{{ snap_packages }}"
+  loop_control:
+    loop_var: package
+    label: "{{ package.name }}"
 
 - name: Clone Dotfiles
   ansible.builtin.git:
