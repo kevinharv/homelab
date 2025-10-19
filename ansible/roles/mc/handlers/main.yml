@@ -1,5 +1,5 @@
 ---
 - name: restart-minecraft
   ansible.builtin.systemd:
-    name: "{{ server_service_name }}"
+    name: "{{ mc_service_name }}"
     state: restarted

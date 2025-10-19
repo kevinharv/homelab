@@ -1,0 +1,13 @@
+---
+- name: Install Minecraft Server
+  hosts: sbxmc01
+  become: true
+  
+  tasks:
+    - name: Install Minecraft Java Server
+      ansible.builtin.include_role:
+        name: mc
+      vars:
+        mc_properties_motd: '\u00a7r            \u00a71\u00a7lSouthwest \u00a74\u00a7lTechnology \u00a76\u00a7lCHIP\u00a7r\n\u00a74           \u2764\u00a7l LUV \u00a74the player, not the game \u2764'
+        mc_properties_rcon_password: "SWOLmatesShouldHaveWon!"
+        mc_eula: true

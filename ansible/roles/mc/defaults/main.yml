@@ -1,0 +1,24 @@
+---
+# OS Defaults
+mc_user: mcsvc
+mc_user_group: mcsvc_g
+mc_service_name: minecraft-server
+mc_install_path: /opt/{{ mc_service_name }}
+mc_level_name: world
+mc_memory_allocation: 5G
+
+# MC Installation
+mc_version: 1.21.10
+mc_eula: false       # By overriding this variable, you agree to https://aka.ms/MinecraftEULA.
+
+# MC Configuration
+mc_port: 25565
+mc_rcon_port: 25575
+
+# server.properties
+# TODO - define remaining properties
+mc_properties_difficulty: normal
+mc_properties_enable_command_block: true
+mc_properties_motd: Minecraft Server deployed via Ansible!
+mc_properties_rcon_password: changeme!
+

@@ -5,24 +5,24 @@
 ---
 - name: Create Service Account Group
   ansible.builtin.group:
-    name: "{{ server_user_group }}"
-    gid: "{{ server_gid | default(omit) }}"
+    name: "{{ mc_user_group }}"
+    gid: "{{ mc_gid | default(omit) }}"
     state: present
 
 - name: Create Service Account
   ansible.builtin.user:
-    name: "{{ server_user }}"
-    group: "{{ server_user_group }}"
-    uid: "{{ server_user_uid | default(omit) }}"
+    name: "{{ mc_user }}"
+    group: "{{ mc_user_group }}"
+    uid: "{{ mc_user_uid | default(omit) }}"
     create_home: false
     state: present
 
 - name: Create Server Directory
   ansible.builtin.file:
-    path: "{{ server_install_path }}"
+    path: "{{ mc_install_path }}"
     state: directory
-    owner: "{{ server_user }}"
-    group: "{{ server_user_group }}"
+    owner: "{{ mc_user }}"
+    group: "{{ mc_user_group }}"
     mode: '0755'
 
 # TODO - download and install custom Java runtime
@@ -31,30 +31,27 @@
     name: java-21-openjdk
     state: present
 
-
 # ========= SELinux Section =========
-
 
 - name: Install SELinux Policy Utilities
   ansible.builtin.package:
     name: policycoreutils-python-utils
 
-- name: Set SELinux Context on {{ server_install_path }}
+- name: Set SELinux Context on {{ mc_install_path }}
   ansible.builtin.command:
-    cmd: semanage fcontext -a -t usr_t "{{ server_install_path }}(/.*)?"
+    cmd: semanage fcontext -a -t usr_t "{{ mc_install_path }}(/.*)?"
     creates: /etc/selinux/targeted/contexts/files/file_contexts.local
 
-- name: Apply SELinux Context on {{ server_install_path }}
+- name: Apply SELinux Context on {{ mc_install_path }}
   ansible.builtin.command:
-    cmd: restorecon -Rv {{ server_install_path }}
+    cmd: restorecon -Rv {{ mc_install_path }}
 
 # ========= PaperMC Server Install Section =========
 
-
 # TODO - skip when version override present
-- name: Get Latest PaperMC Metadata for Minecraft {{ server_version }}
+- name: Get Latest PaperMC Metadata for Minecraft {{ mc_version }}
   ansible.builtin.uri:
-    url: https://api.papermc.io/v2/projects/paper/versions/{{ server_version }}/builds/
+    url: https://api.papermc.io/v2/projects/paper/versions/{{ mc_version }}/builds/
     method: GET
   register: papermc_api_result
 
@@ -70,42 +67,40 @@
 
 - name: Download PaperMC Server JAR
   ansible.builtin.get_url:
-    url: https://api.papermc.io/v2/projects/paper/versions/{{ server_version }}/builds/{{ papermc_build }}/downloads/{{ papermc_filename }}
-    dest: "{{ server_install_path }}/{{ papermc_filename }}"
+    url: https://api.papermc.io/v2/projects/paper/versions/{{ mc_version }}/builds/{{ papermc_build }}/downloads/{{ papermc_filename }}
+    dest: "{{ mc_install_path }}/{{ papermc_filename }}"
     checksum: "sha256:{{ papermc_checksum }}"
-    owner: "{{ server_user }}"
-    group: "{{ server_user_group }}"
+    owner: "{{ mc_user }}"
+    group: "{{ mc_user_group }}"
     mode: '0644'
 
-
 # ========= Server Configuration Section =========
-
 
 - name: Copy server.properties
   ansible.builtin.template:
     src: templates/server.properties.j2
-    dest: "{{ server_install_path }}/server.properties"
-    owner: "{{ server_user }}"
-    group: "{{ server_user_group }}"
+    dest: "{{ mc_install_path }}/server.properties"
+    owner: "{{ mc_user }}"
+    group: "{{ mc_user_group }}"
     mode: '0600'
     backup: true
 
 - name: Copy eula.txt
   ansible.builtin.template:
     src: templates/eula.txt.j2
-    dest: "{{ server_install_path }}/eula.txt"
-    owner: "{{ server_user }}"
-    group: "{{ server_user_group }}"
+    dest: "{{ mc_install_path }}/eula.txt"
+    owner: "{{ mc_user }}"
+    group: "{{ mc_user_group }}"
     mode: '0644'
 
 - name: Download Server Icon
   ansible.builtin.get_url:
-    url: "{{ server_icon_url }}"
-    dest: "{{ server_install_path }}/server-icon.png"
-    owner: "{{ server_user }}"
-    group: "{{ server_user_group }}"
+    url: "{{ mc_icon_url }}"
+    dest: "{{ mc_install_path }}/server-icon.png"
+    owner: "{{ mc_user }}"
+    group: "{{ mc_user_group }}"
     mode: '0644'
-  when: server_icon_url is defined
+  when: mc_icon_url is defined
 
 
 # ========= Finish Host Configuration =========
@@ -113,7 +108,7 @@
 - name: Install systemd Service
   ansible.builtin.template:
     src: templates/minecraft-server.service.j2
-    dest: /etc/systemd/system/{{ server_service_name }}.service
+    dest: /etc/systemd/system/{{ mc_service_name }}.service
     owner: root
     group: root
     backup: true
@@ -132,7 +127,7 @@
 
 - name: Start systemd Service
   ansible.builtin.systemd:
-    name: "{{ server_service_name }}"
+    name: "{{ mc_service_name }}"
     state: started
     enabled: true
     daemon_reload: true
