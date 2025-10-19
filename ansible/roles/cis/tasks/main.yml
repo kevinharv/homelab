@@ -1,0 +1,42 @@
+---
+# SECTION 1
+- name: Configure Filesystem
+  ansible.builtin.include_tasks:
+    file: 1_filesystem.yml
+
+# Package Management
+# SELinux
+# Bootloader
+# Process Hardening
+# Cryptography Policies
+# CLI Banners
+
+# SECTION 2
+# Server Services
+# Client Services
+# NTP
+# Job Schedulers
+
+# SECTION 3
+# Network Devices
+# Network Kernel Modules
+# Network Kernel Parameters
+# IPv6
+
+# SECTION 4
+# Configure Firewall
+
+# SECTION 5
+# Configure SSH
+# Configure Privilege Escalation
+# Configure PAM
+# Configure User Accounts
+
+# SECTION 6
+# Integrity Checking
+# Logging
+# Auditing
+
+# SECTION 7
+# System File Access
+# Local User and Group Settings

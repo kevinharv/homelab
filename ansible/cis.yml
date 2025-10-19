@@ -1,0 +1,6 @@
+---
+- name: Apply CIS Hardening Configuration Baseline
+  hosts: all
+  
+  roles:
+    - cis

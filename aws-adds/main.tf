@@ -54,7 +54,7 @@ resource "aws_instance" "AWSADDSDC001" {
       Start-Process msiexec.exe -Wait -ArgumentList "/i $installerPath /qn"
 
       # Start Tailscale and join Tailnet (replace AUTH_KEY with your actual key)
-      $authKey = "tskey-auth-kZDKda1AEE11CNTRL-pMvCdRoatsKZjw6byk8TsKzALZ4dtTdo7"
+      $authKey = "${var.ts_auth_key}"
       & 'C:\Program Files\Tailscale\tailscale.exe' up --auth-key $authKey --hostname AWSADDSDC001 --unattended
       </powershell>
     EOF

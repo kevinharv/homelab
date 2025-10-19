@@ -19,3 +19,9 @@ variable "aws_secret_key" {
     type = string
     sensitive = true
 }
+
+variable "ts_auth_key" {
+  description = "Tailscale Authentication Key"
+  type = string
+  sensitive = true
+}
