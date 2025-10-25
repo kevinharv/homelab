@@ -61,7 +61,7 @@ resource "aws_security_group" "allow_ssh" {
 
 resource "aws_ec2_instance_state" "awslbench001_state" {
   instance_id = aws_instance.awslbench001.id
-  state = "stopped"
+  state = "running"
 }
 
 resource "aws_instance" "awslbench001" {
