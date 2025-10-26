@@ -58,12 +58,12 @@ resource "aws_route_table" "private_subnet_rt_b" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.natgw_azb.id
+    nat_gateway_id = aws_nat_gateway.natgw_azb.id
   }
 
   route {
     cidr_block = "100.64.0.0/16"
-    gateway_id = "local"
+    local_gateway_id = "local"
   }
 
   tags = {
