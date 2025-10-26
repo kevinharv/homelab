@@ -1,24 +1,7 @@
 /*
-  Module for <BLANK> resource.
+  Module for standard VPC. Provides HA connectivity across 3 subnets
+  including a data subnet with access restricted to the private subnet.
 */
-
-
-#   100.64.0.0/18	
-#     100.64.0.0/20
-#     100.64.16.0/20
-#     100.64.32.0/20
-#   100.64.64.0/18
-#     100.64.64.0/20
-#     100.64.80.0/20
-#     100.64.96.0/20
-#   100.64.128.0/18	
-#     100.64.128.0/20
-#     100.64.144.0/20
-#     100.64.160.0/20
-
-# TODO
-# - NACLs to permit private <> data; deny rest to data
-# - DHCP options + DNS config
 
 data "aws_region" "current_region" {}
 
@@ -37,6 +20,24 @@ resource "aws_internet_gateway" "igw" {
   tags = {
     "Name" = "${var.vpc_name} IGW"
   }
+}
+
+resource "aws_vpc_dhcp_options" "kevharv_options" {
+  domain_name = "aws.kevharv.com"
+  domain_name_servers = [ 
+    "1.1.1.1",
+    "1.0.0.1",
+    "8.8.8.8",
+    "8.8.4.4"
+   ]
+  tags = {
+    "Name" = "aws.kevharv.com"
+  }
+}
+
+resource "aws_vpc_dhcp_options_association" "kevharv_options_assoc" {
+  dhcp_options_id = aws_vpc_dhcp_options.kevharv_options.id
+  vpc_id = aws_vpc.vpc.id
 }
 
 # ====== VPC Route Tables ======

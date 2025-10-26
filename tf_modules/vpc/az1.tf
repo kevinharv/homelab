@@ -1,8 +1,9 @@
 
+# AZ 3 CIDRs
 #   100.64.0.0/18	
-#     100.64.0.0/20
-#     100.64.16.0/20
-#     100.64.32.0/20
+#     100.64.0.0/20     Public
+#     100.64.16.0/20    Private
+#     100.64.32.0/20    Data
 
 # ====== AZ A VPC Subnets ======
 
@@ -86,3 +87,34 @@ resource "aws_route_table_association" "data_aza_rt_assoc" {
   subnet_id = aws_subnet.subnet_data_a.id
 }
 
+# ====== DATA SUBNET RESTRICTIONS ======
+
+resource "aws_network_acl" "private_data_az1" {
+  vpc_id = aws_vpc.vpc.id
+
+  tags = {
+    "Name" = "private-data-subnet-traversal-az1"
+  }
+}
+
+resource "aws_network_acl_rule" "allow_data_from_private_az1" {
+  network_acl_id = aws_network_acl.private_data_az1.id
+  rule_number = 100
+  protocol = "-1"
+  rule_action = "allow"
+  cidr_block = "100.64.16.0/20"
+}
+
+resource "aws_network_acl_rule" "allow_data_to_private_az1" {
+  network_acl_id = aws_network_acl.private_data_az1.id
+  rule_number = 101
+  protocol = "-1"
+  rule_action = "allow"
+  cidr_block = "100.64.16.0/20"
+  egress = true
+}
+
+resource "aws_network_acl_association" "data_nacl_assoc_az1" {
+  network_acl_id = aws_network_acl.private_data_az1.id
+  subnet_id = aws_subnet.subnet_data_a.id
+}
