@@ -1,0 +1,101 @@
+---
+- name: Remove Server Service Packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - autofs
+    - avahi-autoipd
+    - avahi
+    - dhcp-server
+    - bind
+    - dnsmasq
+    - samba
+    - vsftpd
+    - dovecot
+    - cyrus-imapd
+    - nfs-utils
+    - ypserv
+    - cups
+    - rpcbind
+    - rsync-daemon
+    - net-snmp
+    - telnet-server
+    - tftp-server
+    - squid
+    - httpd
+    - nginx
+    - xinetd
+    - xorg-x11-server-Xwayland
+    - postfix
+
+- name: Stop and Disable Services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: false
+    state: stopped
+    masked: true
+  loop:
+    - autofs.service
+    - avahi-daemon.socket
+    - avahi-daemon.service
+    - dhcpd.service
+    - dhcpd6.service
+    - named.service
+    - dnsmasq.service
+    - smb.service
+    - vsftpd.service
+    - dovecot.socket
+    - dovecot.service
+    - cyrus-imapd.service
+    - nfs-server.service
+    - ypserv.service
+    - cups.socket
+    - cups.service
+    - rpcbind.socket
+    - rpcbind.service
+    - rsyncd.socket
+    - rsyncd.service
+    - snmpd.service
+    - telnet.socket
+    - tftp.socket
+    - tftp.service
+    - squid.service
+    - httpd.service
+    - nginx.service
+    - xinetd.service
+  failed_when: false
+
+- name: Remove Client Service Packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - ftp
+    - openldap-clients
+    - ypbind
+    - telnet
+    - tftp
+
+- name: Install crony
+  ansible.builtin.package:
+    name: chrony
+    state: present
+
+- name: Configure chrony
+  ansible.builtin.template:
+    src: chrony.conf.j2
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: 'u-x,go-wx'
+
+- name: Run chrony as non-root
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/chronyd
+    regexp: '^OPTIONS="(?!.* -u chrony.*)(.*)"'
+    line: OPTIONS="\1 -u chrony"
+    create: true
+    backrefs: true
+    mode: 'u-x,go-wx'
+

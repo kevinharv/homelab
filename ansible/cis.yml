@@ -1,6 +1,16 @@
 ---
 - name: Apply CIS Hardening Configuration Baseline
   hosts: all
-  
-  roles:
-    - cis
+  become: true
+
+  vars:
+    cis_grub_password: Testing123!
+
+  tasks:
+    - name: Apply CIS Configuration
+      ansible.builtin.include_role:
+        name: cis
+
+    # - name: Reboot System
+    #   ansible.builtin.reboot:
+    #     reboot_timeout: 180

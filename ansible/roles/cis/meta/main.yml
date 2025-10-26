@@ -11,7 +11,7 @@ galaxy_info:
     - cis
     - rhel
     - rocky
-    - rhel-10
-    - rocky-10
+    - rhel10
+    - rocky10
     - security
     - compliance
