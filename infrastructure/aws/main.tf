@@ -2,85 +2,47 @@
     Entrypoint for "enterprise" foundational infrastructure.
 */
 
-variable "default_tags" {
-  description = "Tags applied to all AWS resources."
-  type        = map(string)
-  default = {
-    "ManagedBy"   = "Terraform"
-    "Environment" = "Enterprise"
+module "vpc" {
+  source   = "../../tf_modules/vpc"
+  vpc_name = "KMH-Lab"
+}
+
+data "aws_ami" "rocky-10-ami" {
+  most_recent      = true
+  owners           = ["679593333241"]   # Rocky Linux Foundation
+
+  filter {
+    name   = "name"
+    values = ["Rocky-10-EC2-Base-10*"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
   }
 }
 
-# General VPC w/ subnets, IGW?
-# General NACLs and security groups?
-# IAM identity center?
-# Cloudwatch?
-# Route53? (probably leave this static configure via UI)
-# SES?
+module "ec2" {
+  source = "../../tf_modules/ec2"
 
-resource "aws_vpc" "harvey_lab" {
-  cidr_block = "10.100.0.0/16"
-  tags = merge(var.default_tags, {
-    "Name" = "harvey-lab-vpc"
-  })
-}
-
-# ========= Public Subnets =========
-
-resource "aws_subnet" "lab_pub_a" {
-  vpc_id     = aws_vpc.harvey_lab.id
-  cidr_block = "10.100.10.0/24"
-  availability_zone = "us-east-2a"
-  tags = merge(var.default_tags, {
-    "Name" = "lab-pub-a"
-  })
-}
-
-resource "aws_subnet" "lab_pub_b" {
-  vpc_id     = aws_vpc.harvey_lab.id
-  cidr_block = "10.100.20.0/24"
-  availability_zone = "us-east-2b"
-  tags = merge(var.default_tags, {
-    "Name" = "lab-pub-b"
-  })
-}
-
-# ========= Service Subnets =========
-
-resource "aws_subnet" "lab_svc_a" {
-  vpc_id     = aws_vpc.harvey_lab.id
-  cidr_block = "10.100.12.0/24"
-  availability_zone = "us-east-2a"
-  tags = merge(var.default_tags, {
-    "Name" = "lab-svc-a"
-  })
-}
-
-resource "aws_subnet" "lab_svc_b" {
-  vpc_id     = aws_vpc.harvey_lab.id
-  cidr_block = "10.100.22.0/24"
-  availability_zone = "us-east-2b"
-  tags = merge(var.default_tags, {
-    "Name" = "lab-svc-b"
-  })
-}
-
-# ========= Private Subnets =========
-
-resource "aws_subnet" "lab_prv_a" {
-  vpc_id     = aws_vpc.harvey_lab.id
-  cidr_block = "10.100.14.0/24"
-  availability_zone = "us-east-2a"
-  tags = merge(var.default_tags, {
-    "Name" = "lab-prv-a"
-  })
-}
-
-resource "aws_subnet" "lab_prv_b" {
-  vpc_id     = aws_vpc.harvey_lab.id
-  cidr_block = "10.100.24.0/24"
-  availability_zone = "us-east-2b"
-  tags = merge(var.default_tags, {
-    "Name" = "lab-prv-b"
-  })
+  hostname = "awsltest001"
+  ami = data.aws_ami.rocky-10-ami.id
+  vpc_id = module.vpc.vpc_id
+  subnet_id = module.vpc.private_subnet_a_id
+  key_name = "aws_lab"
+  user_data = <<-EOF
+      #!/bin/bash
+      sudo hostnamectl set-hostname awsltest001
+      sudo dnf config-manager --add-repo https://pkgs.tailscale.com/stable/rhel/10/tailscale.repo
+      sudo dnf install tailscale -y
+      sudo systemctl enable --now tailscaled
+      export TS_HOSTNAME="awsltest001"
+      export TS_AUTHKEY="${var.ts_auth_key}"
+      sudo tailscale up --auth-key=$TS_AUTHKEY --hostname=$TS_HOSTNAME
+    EOF
 }

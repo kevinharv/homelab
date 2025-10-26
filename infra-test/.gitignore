@@ -1,4 +1,0 @@
-.terraform*
-secrets.auto.tfvars
-.vscode/
-terraform.tfstate*

@@ -1,1 +1,0 @@
-variable "default_tags" {}
