@@ -1,0 +1,7 @@
+hash = -SHA1
+sign = -*-SHA1
+sha1_in_certs = 0
+
+cipher@SSH = -CHACHA20-POLY1305 -3DES-CBC -AES-128-CBC -AES-192-CBC -AES-256-CBC -*-CBC
+etm@SSH = DISABLE_ETM
+mac@SSH = -HMAC-MD5* -UMAC-64* -UMAC-128* -HMAC-MD5* -UMAC-64* -UMAC-128*

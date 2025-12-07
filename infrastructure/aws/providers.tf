@@ -10,14 +10,21 @@
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
-      version = "6.9.0"
+      source  = "hashicorp/aws"
+      version = "6.18.0"
     }
   }
 }
 
 provider "aws" {
-  region = var.aws_region
+  region     = var.aws_region
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
+
+  default_tags {
+    tags = {
+      "ManagedBy" = "Terraform"
+      "Project"   = "Infrastructure Testing"
+    }
+  }
 }

@@ -1,16 +1,11 @@
 ---
-# SECTION 1
-- name: Configure Filesystem
-  ansible.builtin.include_tasks:
-    file: 1_filesystem.yml
+- name: Section 1
+  ansible.builtin.import_tasks:
+    file: section_1.yml
 
-# Package Management
-# SELinux
-# Bootloader
-# Process Hardening
-# Cryptography Policies
-# CLI Banners
-
+- name: Section 2
+  ansible.builtin.import_tasks:
+    file: section_2.yml
 # SECTION 2
 # Server Services
 # Client Services
