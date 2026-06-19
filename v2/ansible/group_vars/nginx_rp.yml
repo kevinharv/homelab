@@ -1,0 +1,36 @@
+nginx_http_port: 80
+nginx_https_port: 443
+
+nginx_server_name: lab.kevharv.com
+
+nginx_sites:
+  - name: jellyfin
+    hostname: jellyfin.lab.kevharv.com
+    backend: http://192.168.1.11:8096
+    oauth_enabled: false
+
+nginx_streams: []
+  # PLACEHOLDER - proxy TCP traffic
+  # - name: minecraft1
+  #   listen_port: 25565
+  #   upstream_host: 10.10.50.10
+  #   upstream_port: 25565
+
+oauth2_proxy:
+  version: v7.15.3
+  provider: google
+  client_id: "{{ vault_google_client_id }}"
+  client_secret: "{{ vault_google_client_secret }}"
+  cookie_secret: "{{ vault_cookie_secret }}"
+  email_domains:
+    - "*"
+
+  allowed_emails:
+    - kharvey2002@gmail.com
+    - caitlin.mcalanis@gmail.com
+
+certbot:
+  email: kharvey2002@gmail.com
+  domains:
+    - "*.lab.kevharv.com"
+    - "lab.kevharv.com"

@@ -1,0 +1,18 @@
+provider = "google"
+
+client_id = "{{ oauth2_proxy.client_id }}"
+client_secret = "{{ oauth2_proxy.client_secret }}"
+
+cookie_secret = "{{ oauth2_proxy.cookie_secret }}"
+
+http_address = "127.0.0.1:4180"
+
+email_domains = [
+{% for d in oauth2_proxy.email_domains %}
+"{{ d }}",
+{% endfor %}
+]
+
+authenticated_emails_file = "/etc/oauth2-proxy/emails.txt"
+
+redirect_url = "https://oauth.lab.kevharv.com/oauth2/callback"

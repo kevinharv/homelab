@@ -1,0 +1,16 @@
+stream {
+
+{% for stream in nginx_streams %}
+
+    upstream {{ stream.name }} {
+        server {{ stream.upstream_host }}:{{ stream.upstream_port }};
+    }
+
+    server {
+        listen {{ stream.listen_port }};
+        proxy_pass {{ stream.name }};
+    }
+
+{% endfor %}
+
+}

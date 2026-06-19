@@ -1,0 +1,13 @@
+---
+- name: Deploy NGINX Reverse Proxy
+  hosts: nginx_rp
+  gather_facts: true
+  become: true
+
+  vars_files:
+    - group_vars/vault.yml
+
+  roles:
+    - nginx
+    - oauth2_proxy
+    - certbot

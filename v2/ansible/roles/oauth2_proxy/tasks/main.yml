@@ -1,0 +1,52 @@
+---
+- name: Create OAuth2 Proxy Group
+  ansible.builtin.group:
+    name: oauth2-proxy
+    system: true
+
+- name: Create OAuth2 Proxy User
+  ansible.builtin.user:
+    name: oauth2-proxy
+    group: oauth2-proxy
+    system: true
+    shell: /sbin/nologin
+    home: /var/lib/oauth2-proxy
+
+- name: Create OAuth2 Proxy State Directory
+  ansible.builtin.file:
+    path: /var/lib/oauth2-proxy
+    state: directory
+    owner: oauth2-proxy
+    group: oauth2-proxy
+    mode: "0750"
+
+- name: Create OAuth2 Proxy Configuration Directory
+  ansible.builtin.file:
+    path: /etc/oauth2-proxy
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download OAuth2 Proxy
+  ansible.builtin.unarchive:
+    src: https://github.com/oauth2-proxy/oauth2-proxy/releases/download/{{ oauth2_proxy.version }}/oauth2-proxy-{{ oauth2_proxy.version}}.linux-amd64.tar.gz
+    dest: /opt
+    remote_src: true
+
+- name: Deploy Configuration
+  ansible.builtin.template:
+    src: oauth2-proxy.cfg.j2
+    dest: /etc/oauth2-proxy/oauth2-proxy.cfg
+
+- name: Install systemd Service
+  ansible.builtin.template:
+    src: oauth2-proxy.service.j2
+    dest: /etc/systemd/system/oauth2-proxy.service
+
+- name: Start Service
+  ansible.builtin.systemd:
+    name: oauth2-proxy
+    enabled: true
+    daemon_reload: true
+    state: started

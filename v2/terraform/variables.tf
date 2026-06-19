@@ -34,14 +34,14 @@ variable "pve_node" {
     Workload definition variables.
 */
 
-variable "jellyfin_template_file_id" {
+variable "ubuntu_template_file_id" {
   description = "Proxmox template file ID for the Ubuntu 26.04 LXC image."
   type        = string
   default     = "local:vztmpl/ubuntu-26.04-standard_26.04-1_amd64.tar.zst"
 }
 
-variable "jellyfin_ssh_public_key_path" {
-  description = "Path to the public SSH key used for Jellyfin container root access."
+variable "ssh_public_key_path" {
+  description = "Path to the public SSH key used for workload container root access."
   type        = string
   default     = "/home/kevin/.ssh/prox_lab.pub"
 }

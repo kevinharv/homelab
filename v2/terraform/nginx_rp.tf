@@ -1,15 +1,15 @@
-resource "random_password" "jellyfin_root_password" {
+resource "random_password" "nginx_rp_root_password" {
   length           = 32
   override_special = "_%@"
   special          = true
 }
 
-resource "proxmox_virtual_environment_container" "jellyfin" {
-  description = "Jellyfin personal media server."
-  tags        = ["jellyfin", "media"]
+resource "proxmox_virtual_environment_container" "nginx_rp" {
+  description = "NGINX reverse proxy service for ingress traffic and routing."
+  tags        = ["nginx", "ingress"]
 
   node_name    = var.pve_node
-  vm_id        = 1101
+  vm_id        = 1005
   unprivileged = true
 
   features {
@@ -17,18 +17,18 @@ resource "proxmox_virtual_environment_container" "jellyfin" {
   }
 
   initialization {
-    hostname = "jellyfin"
+    hostname = "nginxrp"
 
     ip_config {
       ipv4 {
-        address = "192.168.1.11/24"
+        address = "192.168.1.10/24"
         gateway = "192.168.1.254"
       }
     }
 
     user_account {
       keys     = [file(var.ssh_public_key_path)]
-      password = random_password.jellyfin_root_password.result
+      password = random_password.nginx_rp_root_password.result
     }
   }
 
@@ -43,16 +43,11 @@ resource "proxmox_virtual_environment_container" "jellyfin" {
 
   disk {
     datastore_id = "local-lvm"
-    size         = 16
-  }
-
-  mount_point {
-    volume = "tank:vm-115-disk-0"
-    path   = "/mnt/media"
+    size         = 8
   }
 
   memory {
-    dedicated = 4096
+    dedicated = 1024
     swap      = 1024
   }
 
@@ -63,8 +58,8 @@ resource "proxmox_virtual_environment_container" "jellyfin" {
 
   start_on_boot = true
   startup {
-    order      = 10
-    up_delay   = 30
+    order      = 5
+    up_delay   = 10
     down_delay = 30
   }
 }

@@ -1,0 +1,48 @@
+---
+- name: Install Certbot
+  ansible.builtin.package:
+    name:
+      - certbot
+      - python3-certbot-dns-cloudflare
+    state: present
+
+- name: Create Cloudflare Credentials
+  ansible.builtin.template:
+    src: cloudflare.ini.j2
+    dest: /etc/letsencrypt/cloudflare.ini
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Check for Certificate
+  ansible.builtin.stat:
+    path: /etc/letsencrypt/live/lab.kevharv.com/fullchain.pem
+  register: cert_exists
+
+- name: Obtain Certificate
+  ansible.builtin.command: >
+    certbot certonly
+    --non-interactive
+    --agree-tos
+    --email {{ certbot.email }}
+    --dns-cloudflare
+    --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini
+    {% for d in certbot.domains %}
+    -d {{ d }}
+    {% endfor %}
+  when: not cert_exists.stat.exists
+  retries: 3
+
+- name: Install Renewal Hook
+  ansible.builtin.copy:
+    dest: /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+    mode: "0755"
+    content: |
+      #!/bin/bash
+      systemctl reload nginx
+
+- name: Enable Certbot Timer
+  ansible.builtin.systemd:
+    name: certbot.timer
+    enabled: true
+    state: started
