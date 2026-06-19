@@ -2,11 +2,10 @@ nginx_http_port: 80
 nginx_https_port: 443
 
 nginx_server_name: lab.kevharv.com
-
 nginx_sites:
   - name: jellyfin
     hostname: jellyfin.lab.kevharv.com
-    backend: http://192.168.1.11:8096
+    backend: http://192.168.1.11:8096/
     oauth_enabled: false
 
 nginx_streams: []
